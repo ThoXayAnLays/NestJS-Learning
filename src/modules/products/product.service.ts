@@ -30,11 +30,20 @@ export class ProductService{
         return this.products.find(item => item.id === Number(id));
     }
 
-    updateProduct(): string{
-        return 'UPDATE PRODUCT'
+    updateProduct(productDto: ProductDto, id: number): Product{
+        const index = this.products.findIndex(item => item.id === Number(id));
+        this.products[index].categoryId = productDto.categoryId;
+        this.products[index].productName = productDto.productName;
+        this.products[index].price = productDto.price;
+        return this.products[index];
     }
 
-    deleteProduct(): string{
-        return 'DELETE PRODUCT'
+    deleteProduct(id: number): boolean{
+        const index = this.products.findIndex(item => item.id === Number(id));
+        if(index !== -1){
+            this.products.splice(index, 1);
+            return true;
+        }
+        return false;
     }
 }
