@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, ValidationPipe } from "@nestjs/common";
 import { ProductService } from "./product.service";
 import { ResponseData } from "src/global/globalClass";
 import { HttpMessage, HttpStatus } from "src/global/globalEnum";
 import { Product } from 'src/models/product.model';
 import { ProductDto } from "src/dto/product.dto";
+import { AuthenticationGuard } from "src/authentication/authentication.guard";
 
 @Controller('products')
 export class ProductsController {
@@ -11,6 +12,7 @@ export class ProductsController {
     constructor(private readonly productService: ProductService){}
 
     @Get()
+    @UseGuards(AuthenticationGuard)
     getListProduct(): ResponseData<Product[]>{
         try{
             return new ResponseData<Product[]>(this.productService.getListProduct(), HttpStatus.SUCCESS, HttpMessage.SUCCESS);
