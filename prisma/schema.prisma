@@ -13,28 +13,11 @@ datasource db {
 model User{
   id Int @id @default(autoincrement())
   email String @unique
-  hashedPassword String
-  firstName String
-  lastName String
+  hash String
+  hashRt String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  favorites Favorite[]
   @@map("users")
-}
-
-model Favorite {
-  id Int @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  title String
-  description String?
-  link String
-
-  userId Int
-  user User @relation(fields: [userId], references: [id])
-
-  @@map("favorites")
 }
 
 model Category{
