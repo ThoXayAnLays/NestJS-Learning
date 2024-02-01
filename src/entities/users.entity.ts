@@ -1,9 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn} from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn} from "typeorm";
 import { Role } from "src/constant/enum";
-import { BaseEntity } from "src/common/postgres/base.entity";
 
 @Entity('users')
-export class UserEntity extends BaseEntity{
+export class UserEntity{
+    @PrimaryGeneratedColumn("uuid")
+    id: string;
+
     @Column()
     firstName: string;
 
@@ -17,4 +19,19 @@ export class UserEntity extends BaseEntity{
     password: string;
 
     public roles: Role[];
+
+    @CreateDateColumn({
+        name: 'created_at'
+    })
+    createdAt: Date;
+
+    @UpdateDateColumn({
+        name: 'updated_at'
+    })
+    updatedAt: Date;
+
+    @DeleteDateColumn({
+        name: 'deleted_at'
+    })
+    deletedAt: Date;
 }

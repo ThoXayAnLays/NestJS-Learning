@@ -23,7 +23,7 @@ import { UserEntity } from './entities/users.entity';
       entities: [UserEntity],
       logger: 'advanced-console',
       logging: 'all',
-      synchronize: false,
+      synchronize: true,
     }),
     UsersModule
   ],

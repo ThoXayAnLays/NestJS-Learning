@@ -7,7 +7,7 @@ import { Public } from "src/common/decorators";
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    // @Public()
+    @Public()
     @Post()
     createUser(@Body() user: UserDto): Promise<UserDto> {
         return this.userService.save(user);
