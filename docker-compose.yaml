@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  dev-db:
+  dev-db-postgres:
     image: postgres:16.1
     ports:
       - 5434:5432

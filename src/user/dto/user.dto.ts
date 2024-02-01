@@ -1,10 +1,14 @@
+import { Expose, Transform } from 'class-transformer';
 import {
     IsEmail,
     IsOptional,
     IsString,
 } from 'class-validator';
 
-export class EditUserDto {
+export class UserDto {
+    @Expose()
+    id: string;
+
     @IsOptional()
     @IsString()
     firstName?: string;
@@ -13,7 +17,7 @@ export class EditUserDto {
     @IsString()
     lastName?: string;
 
-    @IsOptional()
-    @IsEmail()
-    email?: string;
+    @Expose()
+    @Transform(({obj}) => obj.firstName+' '+obj.lastName)
+    fullName
 }

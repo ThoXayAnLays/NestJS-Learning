@@ -1,15 +1,32 @@
 import { Module } from '@nestjs/common';
 import { ProductsModule } from './modules/products/product.modules';
-import { PrismaService } from './prisma/prisma.service';
 import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
-import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AtGuard } from './common/guards';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { PrismaModule } from './prisma/prisma.module';
+import { UsersModule } from './user/user.module';
+import { UserEntity } from './entities/users.entity';
 
 @Module({
-  imports: [ProductsModule, PrismaModule, AuthModule],
+  imports: [ProductsModule, AuthModule, PrismaModule,
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5434,
+      username: 'postgres',
+      password: '123',
+      database: 'nestjs',
+      entities: [UserEntity],
+      logger: 'advanced-console',
+      logging: 'all',
+      synchronize: false,
+    }),
+    UsersModule
+  ],
   providers: [
     {
       provide: APP_GUARD,
@@ -17,4 +34,6 @@ import { AtGuard } from './common/guards';
     }
   ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private dataSoure: DataSource){}
+}
