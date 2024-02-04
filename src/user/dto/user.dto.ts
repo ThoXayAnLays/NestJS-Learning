@@ -17,6 +17,14 @@ export class UserDto {
     @IsString()
     lastName?: string;
 
+    @IsOptional()
+    @IsEmail()
+    email?: string;
+
+    @IsOptional()
+    @IsString()
+    password?: string;
+
     @Expose()
     @Transform(({obj}) => obj.firstName+' '+obj.lastName)
     fullName

@@ -14,6 +14,11 @@ import { ProductsEntity } from './entities/products.entity';
 import { CategoriesEntity } from './entities/categories.entity';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
+import { BullModule } from '@nestjs/bull';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { join } from 'path';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
 @Module({
   imports: [ProductsModule, AuthModule, PrismaModule, 
@@ -31,7 +36,44 @@ import { ScheduleModule } from '@nestjs/schedule';
     }),
     UsersModule,
     EventEmitterModule.forRoot(),
-    ScheduleModule.forRoot()
+    ScheduleModule.forRoot(),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async(config: ConfigService) => ({
+        //transport: config.get('MAIL_TRANSPORT'),
+        transport: {
+          host: config.get('MAIL_HOST'),
+          secure: false,
+          auth: {
+            user: config.get('MAIL_USER'),
+            pass: config.get('MAIL_PASSWORD')
+          }
+        },
+        defaults: {
+          from: `"No Reply" <${config.get('MAIL_FROM')}>`
+        },
+        template: {
+          dir: join(__dirname, 'src/templates/email'),  
+          adapter: new HandlebarsAdapter(),
+          options: {
+            strict: true,
+          }
+        }
+      }),
+      inject: [ConfigService],
+    }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async(config: ConfigService) => ({
+        redis: {
+          host: 'localhost',
+          port: 5434,
+          username: 'postgres',
+          password: '123',
+        }
+      }),
+      inject: [ConfigService],
+    }),
   ],
   providers: [
     {

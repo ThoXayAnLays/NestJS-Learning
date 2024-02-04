@@ -7,6 +7,8 @@ import { plainToInstance } from "class-transformer";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { UserCreatedEvent } from "src/events/user.event";
 import { Cron, CronExpression, SchedulerRegistry } from "@nestjs/schedule";
+import { InjectQueue } from "@nestjs/bull";
+import { Queue } from "bull";
 
 @Injectable()
 export class UserService {
@@ -14,6 +16,8 @@ export class UserService {
         @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
         private readonly eventEmitter: EventEmitter2,
         private scheduleRegistry: SchedulerRegistry,
+        @InjectQueue('sendMail') 
+        private sendMail: Queue,
     ) {}
 
     getHello(): string {
@@ -22,6 +26,7 @@ export class UserService {
 
     async save(userDto: UserDto): Promise<UserDto> {
         const savedUser = await this.userRepository.save(userDto);
+
         this.eventEmitter.emit(
             'user.created', 
             new UserCreatedEvent(savedUser.id, savedUser.fullName)
@@ -30,6 +35,18 @@ export class UserService {
             this.establishWsTimeout(savedUser.id), 5000;
         });
         this.scheduleRegistry.addTimeout(`${savedUser.id}_establish_ws`, establishWsTimeout);
+
+        await this.sendMail.add(
+            'register-email',
+            {
+              to: userDto.email,
+              firstName: userDto.firstName,
+            },
+            {
+              removeOnComplete: true,
+            },
+        );
+
         return plainToInstance(UserDto, savedUser, {
             excludeExtraneousValues: true,
         });
@@ -39,22 +56,22 @@ export class UserService {
         console.log(`Establishing websocket connection for user ${userId}...`);
     }
 
-    @Cron(CronExpression.EVERY_10_SECONDS, {name: 'delete_expired_users'})
-    deleteExpiredUsers(){
-        console.log('Deleting expired users...');
-    }
+    // @Cron(CronExpression.EVERY_10_SECONDS, {name: 'delete_expired_users'})
+    // deleteExpiredUsers(){
+    //     console.log('Deleting expired users...');
+    // }
     
-    @OnEvent('user.created')
-    welcomeNewUser(payload: UserCreatedEvent) {
-        console.log(`Welcome ${payload.fullName}!`);
-    }
+    // @OnEvent('user.created')
+    // welcomeNewUser(payload: UserCreatedEvent) {
+    //     console.log(`Welcome ${payload.fullName}!`);
+    // }
 
-    @OnEvent('user.created')
-    async sendWelcomeEmail(payload: UserCreatedEvent) {
-        console.log(`Sending welcome email to ${payload.fullName}...`);
-        await new Promise<void>((resolve) => setTimeout(() => resolve(), 3000));
-        console.log('Email sent!');
-    }
+    // @OnEvent('user.created')
+    // async sendWelcomeEmail(payload: UserCreatedEvent) {
+    //     console.log(`Sending welcome email to ${payload.fullName}...`);
+    //     await new Promise<void>((resolve) => setTimeout(() => resolve(), 3000));
+    //     console.log('Email sent!');
+    // }
 
     async update(id: string, userDto: UserDto): Promise<{ result: string }> {
         const updatedResult = await this.userRepository.update(id, userDto);
