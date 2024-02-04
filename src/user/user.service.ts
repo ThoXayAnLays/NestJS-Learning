@@ -39,11 +39,11 @@ export class UserService {
         await this.sendMail.add(
             'register-email',
             {
-              to: userDto.email,
-              firstName: userDto.firstName,
+                to: userDto.email,
+                firstName: userDto.firstName,
             },
             {
-              removeOnComplete: true,
+                removeOnComplete: true,
             },
         );
 

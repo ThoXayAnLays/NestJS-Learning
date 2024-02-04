@@ -7,7 +7,7 @@ export class  $npmConfigName1706862135514 implements MigrationInterface {
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         this.logger.log('Migration has been run');
-        await queryRunner.query(`UPDATE users SET email = 'test@gmail' WHERE id = 1`);
+        //await queryRunner.query(`UPDATE users SET email = 'test@gmail' WHERE id = 1`);
     }
 
     public async down(): Promise<void> {
