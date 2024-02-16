@@ -1,22 +1,22 @@
-import { MailerService } from "@nestjs-modules/mailer";
-import { Process, Processor } from "@nestjs/bull";
-import { Job } from "bull";
+import { Process, Processor } from '@nestjs/bull';
+import { Job } from 'bull';
+import { MailerService } from '@nestjs-modules/mailer';
 
-@Processor('sendMail')
+@Processor('send-mail')
 export class EmailConsumer {
-    constructor(private mailService: MailerService) {}
+    constructor(private mailerService: MailerService) {}
 
-    @Process('register-email')
+    @Process('register')
     async registerEmail(job: Job<unknown>) {
-        console.log('Sending mail to', job.data);
+        console.log(job.data);
         const time1 = new Date();
-        await this.mailService.sendMail({
+        await this.mailerService.sendMail({
             to: job.data['to'],
-            subject: 'Welcome to NestJS',
-            template: './welcome', 
+            subject: 'Welcome to my website',
+            template: './welcome',
             context: {
-                name: job.data['firstName'],
-            }
+                name: job.data['name'],
+        },
         });
         const time2 = new Date();
         console.log('Send Success: ', time2.getTime() - time1.getTime(), 'ms');

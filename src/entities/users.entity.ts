@@ -1,5 +1,5 @@
+import { IsOptional } from "class-validator";
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn} from "typeorm";
-import { Role } from "src/constant/enum";
 
 @Entity('users')
 export class UserEntity{
@@ -18,20 +18,16 @@ export class UserEntity{
     @Column()
     password: string;
 
-    public roles: Role[];
+    @Column()
+    @IsOptional()
+    refreshToken: string;
 
-    @CreateDateColumn({
-        name: 'created_at'
-    })
-    createdAt: Date;
+    @Column()
+    @IsOptional()
+    twoFactorAuthSecret: string;
 
-    @UpdateDateColumn({
-        name: 'updated_at'
-    })
-    updatedAt: Date;
-
-    @DeleteDateColumn({
-        name: 'deleted_at'
-    })
-    deletedAt: Date;
+    @Column()
+    @IsOptional()
+    isTwoFactorAuthenticationEnabled: boolean;
+    default: false;
 }

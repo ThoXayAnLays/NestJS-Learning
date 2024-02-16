@@ -1,7 +1,7 @@
-import { Expose, Transform } from 'class-transformer';
+import { Expose } from 'class-transformer';
 import {
     IsEmail,
-    IsOptional,
+    IsNotEmpty,
     IsString,
 } from 'class-validator';
 
@@ -9,23 +9,27 @@ export class UserDto {
     @Expose()
     id: string;
 
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
-    firstName?: string;
+    firstName: string;
 
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
-    lastName?: string;
+    lastName: string;
 
-    @IsOptional()
+    @IsNotEmpty()
     @IsEmail()
-    email?: string;
+    email: string;
 
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
-    password?: string;
+    password: string;
+}
 
-    @Expose()
-    @Transform(({obj}) => obj.firstName+' '+obj.lastName)
-    fullName
+export class LoginUserDto {
+    @IsNotEmpty() 
+    email: string;
+
+    @IsNotEmpty() 
+    password: string;
 }
