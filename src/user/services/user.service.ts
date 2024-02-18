@@ -7,7 +7,6 @@ import { plainToInstance } from "class-transformer";
 import * as bcrypt from 'bcrypt';
 
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
-import { UserCreatedEvent } from "src/events/user.event";
 import { Cron, CronExpression, SchedulerRegistry } from "@nestjs/schedule";
 import { InjectQueue } from "@nestjs/bull";
 import { Queue } from "bull";

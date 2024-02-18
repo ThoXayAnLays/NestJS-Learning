@@ -14,11 +14,26 @@ import { MailerModule} from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { GenreModule } from './genre/genre.module';
+import { MovieModule } from './movie/movie.module';
+import { AuthorModule } from './author/author.module';
+import { BookModule } from './book/book.module';
+import { ProfileModule } from './profile/profile.module';
+import { ProfileEntity } from './entities/profiles.entity';
+import { GenreEntity } from './entities/genres.entity';
+import { MovieEntity } from './entities/movies.entity';
+import { AuthorEntity } from './entities/authors.entity';
+import { BookEntity } from './entities/books.entity';
 
 @Module({
   imports: [
     ProductsModule, 
     UsersModule,
+    ProfileModule,
+    GenreModule,
+    MovieModule,
+    AuthorModule,
+    BookModule,
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -27,7 +42,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
       username: 'postgres',
       password: '123',
       database: 'nestjs',
-      entities: [UserEntity, /*ProductsEntity, CategoriesEntity*/],
+      entities: [UserEntity, ProfileEntity, GenreEntity, MovieEntity, AuthorEntity, BookEntity/*ProductsEntity, CategoriesEntity*/],
       logger: 'advanced-console',
       logging: 'all',
       synchronize: true,

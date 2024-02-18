@@ -23,19 +23,19 @@ import { TwoFactorAuthenticationController } from './controllers/twoFactorAuthen
         TypeOrmModule.forFeature([UserEntity]),
         
         PassportModule.register({
-        defaultStrategy: 'jwt',
-        property: 'user',
-        session: false,
+            defaultStrategy: 'jwt',
+            property: 'user',
+            session: false,
         }),
         JwtModule.registerAsync({
-        imports: [ConfigModule],
-        useFactory: async (configService: ConfigService) => ({
-            secret: configService.get('AT_SECRET'),
-            signOptions: {
-            expiresIn: configService.get('EXPIRESIN'),
-            },
-        }),
-        inject: [ConfigService],
+            imports: [ConfigModule],
+            useFactory: async (configService: ConfigService) => ({
+                secret: configService.get('AT_SECRET'),
+                signOptions: {
+                expiresIn: configService.get('EXPIRESIN'),
+                },
+            }),
+            inject: [ConfigService],
         }),
         // BullModule.registerQueue({
         //     name: 'send-mail',

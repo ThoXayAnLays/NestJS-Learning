@@ -21,8 +21,7 @@ export class AuthService{
         const token = await this._createToken(user);
         await this.userRepository.save({
             email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
+            userName: user.userName,
             password: user.password,
             refreshToken: token.refreshToken,
             twoFactorAuthSecret: 'test',

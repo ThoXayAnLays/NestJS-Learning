@@ -4,6 +4,11 @@ import { CategoriesEntity } from 'src/entities/categories.entity';
 import { ProductsEntity } from 'src/entities/products.entity';
 import { UserEntity } from './src/entities/users.entity';
 import { DataSource } from 'typeorm';
+import { ProfileEntity } from 'src/entities/profiles.entity';
+import { GenreEntity } from 'src/entities/genres.entity';
+import { MovieEntity } from 'src/entities/movies.entity';
+import { AuthorEntity } from 'src/entities/authors.entity';
+import { BookEntity } from 'src/entities/books.entity';
 
 
 config();
@@ -21,5 +26,5 @@ export default new DataSource({
     logging: 'all',
     synchronize: true,
     migrations: ['migrations/**'],
-    entities: [UserEntity],
+    entities: [UserEntity, ProfileEntity, GenreEntity, MovieEntity, AuthorEntity, BookEntity],
 })

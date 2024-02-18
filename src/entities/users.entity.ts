@@ -1,5 +1,6 @@
 import { IsOptional } from "class-validator";
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn} from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, CreateDateColumn, UpdateDateColumn, DeleteDateColumn} from "typeorm";
+import { ProfileEntity } from "./profiles.entity";
 
 @Entity('users')
 export class UserEntity{
@@ -7,10 +8,7 @@ export class UserEntity{
     id: string;
 
     @Column()
-    firstName: string;
-
-    @Column()
-    lastName: string;
+    userName: string;
 
     @Column()
     email: string;
@@ -30,4 +28,8 @@ export class UserEntity{
     @IsOptional()
     isTwoFactorAuthenticationEnabled: boolean;
     default: false;
+
+    @OneToOne(() => ProfileEntity, (profile: ProfileEntity) => profile.user)
+    @IsOptional()
+    profile: ProfileEntity;
 }

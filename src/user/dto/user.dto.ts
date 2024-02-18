@@ -9,27 +9,23 @@ export class UserDto {
     @Expose()
     id: string;
 
-    @IsNotEmpty()
-    @IsString()
-    firstName: string;
+    @IsNotEmpty({ message: 'Username is required' })
+    @IsString({ message: 'Invalid username' })
+    userName: string;
 
-    @IsNotEmpty()
-    @IsString()
-    lastName: string;
-
-    @IsNotEmpty()
-    @IsEmail()
+    @IsNotEmpty({ message: 'Email is required' })
+    @IsEmail({}, { message: 'Invalid email'})
     email: string;
 
-    @IsNotEmpty()
-    @IsString()
+    @IsNotEmpty({ message: 'Password is required' })
+    @IsString({ message: 'Invalid password' })
     password: string;
 }
 
 export class LoginUserDto {
-    @IsNotEmpty() 
+    @IsNotEmpty({ message: 'Email is required' })  
     email: string;
 
-    @IsNotEmpty() 
+    @IsNotEmpty({ message: 'Password is required' }) 
     password: string;
 }

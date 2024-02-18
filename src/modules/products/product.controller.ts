@@ -4,7 +4,7 @@ import { ProductService } from "./product.service";
 import { HttpMessage, HttpStatus } from "src/global/globalEnum";
 import { Product } from 'src/models/product.model';
 import { ProductDto } from "src/dto/product.dto";
-import { AuthenticationGuard } from "src/authentication/authentication.guard";
+// import { AuthenticationGuard } from "src/authentication/authentication.guard";
 
 @Controller('products')
 export class ProductsController {

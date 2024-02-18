@@ -7,11 +7,11 @@ import { UserService } from "../services/user.service";
 export class UserController {
     constructor(private readonly userService: UserService) {}
 
-    @UseGuards(AuthGuard('jwt-two-factor'))
-    @Get('profile')
-    async getProfile(@Req() req: any) {
-        return req.user;
-    }
+    // @UseGuards(AuthGuard('jwt-two-factor'))
+    // @Get('profile')
+    // async getProfile(@Req() req: any) {
+    //     return req.user;
+    // }
 
     @Delete('/:id')
     deleteUserById(@Param('id') id: string) {
