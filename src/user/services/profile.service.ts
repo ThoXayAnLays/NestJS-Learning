@@ -51,7 +51,7 @@ export class ProfileService{
     async uploadAvatar(userId: string, avatar: string): Promise<UpdateResult> {
         const profile = await this.profileRepository.findOne({ where: { user: { id: userId } } });
         if(!profile) throw new Error('Profile not found');
-        return await this.profileRepository.update(userId, { avatar });
+        return await this.profileRepository.update(profile.id, { avatar });
     }
 
     async deleteProfile(id: string): Promise<void> {
