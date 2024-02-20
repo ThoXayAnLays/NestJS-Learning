@@ -6,7 +6,7 @@ export class CreateBookDto{
     id: string;
 
     @IsNotEmpty({ message: 'Title is required' })
-    title: string;
+    bookTitle: string;
 
     @IsNotEmpty({ message: 'Description is required' })
     description: string;
@@ -24,7 +24,7 @@ export class UpdateBookDto{
     id: string;
 
     @IsOptional()
-    title: string;
+    bookTitle: string;
 
     @IsOptional()
     description: string;

@@ -1,8 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { BookEntity } from "src/entities/books.entity";
-import { Repository } from "typeorm";
+import { DeepPartial, Repository } from "typeorm";
 import { CreateBookDto, UpdateBookDto } from "./dto";
+import { AuthorEntity } from "src/entities/authors.entity";
 
 @Injectable()
 export class BookService{
@@ -18,19 +19,24 @@ export class BookService{
         return await this.bookRepository.findOne({ where: { id } });
     }
 
-    async getBooksByAuthor(id: string): Promise<BookEntity> {
-        return await this.bookRepository.findOne({ where: { id }, relations: ['author'] });
+    async getBooksByAuthor(authorId: string): Promise<BookEntity[]> {
+        return await this.bookRepository.find({ where: { author: { id: authorId } } });
     }
 
-    async createBook(bookData: CreateBookDto): Promise<BookEntity> {
+    async createBook(bookData: Partial<CreateBookDto>): Promise<BookEntity> {
+        const { author, ...rest } = bookData;
         const newBook = this.bookRepository.create({
-            ...bookData,
-            author: { id: bookData.author } // Assuming 'author' is a string representing the author's ID
-        });
+            ...rest,
+            author: { id: author } as DeepPartial<AuthorEntity>
+        }) as BookEntity;
         return await this.bookRepository.save(newBook);
     }
 
-    async updateBook(id: string, bookData: UpdateBookDto): Promise<BookEntity> {
+    async updateBook(id: string, bookData: Partial<UpdateBookDto>): Promise<BookEntity> {
+        const book = await this.bookRepository.findOne({ where: { id } });
+        if (!book) {
+            throw new Error('Book not found');
+        }
         const { author, ...rest } = bookData;
         const updatedBookData = {
             ...rest,

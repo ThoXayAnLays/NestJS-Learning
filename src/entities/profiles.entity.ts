@@ -1,4 +1,4 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { UserEntity } from "./users.entity";
 import { IsNotEmpty, IsOptional } from "class-validator";
 
@@ -15,7 +15,14 @@ export class ProfileEntity{
     @IsNotEmpty()
     lastName: string;
 
+    @Column({ nullable: true, default: null })
+    avatar: string;
+
+    @Column({ name: 'user_id' })
+    userId: string;
+
     @OneToOne(() => UserEntity, (user: UserEntity) => user.profile)
     @IsOptional()
+    @JoinColumn({ name: 'user_id' })
     user: UserEntity;
 }

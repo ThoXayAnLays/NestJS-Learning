@@ -118,11 +118,6 @@ export class UserService {
         return user;
     }
 
-    async deleteUserById(id: string): Promise<{ result: string }> {
-        const deletedResult = await this.userRepository.softDelete(id);
-        return {result: 'success'}
-    }
-
     async findByEmail(email) {
         return await this.userRepository.findBy({
             email: email,

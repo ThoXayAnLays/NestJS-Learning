@@ -18,7 +18,6 @@ import { GenreModule } from './genre/genre.module';
 import { MovieModule } from './movie/movie.module';
 import { AuthorModule } from './author/author.module';
 import { BookModule } from './book/book.module';
-import { ProfileModule } from './profile/profile.module';
 import { ProfileEntity } from './entities/profiles.entity';
 import { GenreEntity } from './entities/genres.entity';
 import { MovieEntity } from './entities/movies.entity';
@@ -29,7 +28,6 @@ import { BookEntity } from './entities/books.entity';
   imports: [
     ProductsModule, 
     UsersModule,
-    ProfileModule,
     GenreModule,
     MovieModule,
     AuthorModule,

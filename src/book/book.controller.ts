@@ -1,14 +1,14 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
 import { BookService } from "./book.service";
 import { BookEntity } from "src/entities/books.entity";
-import { CreateBookDto } from "./dto";
+import { CreateBookDto, UpdateBookDto } from "./dto";
 
 @Controller('books')
 export class BookController{
     constructor(private readonly bookService: BookService) {}
 
     @Get()
-    async getAll() {
+    async getAll(): Promise<BookEntity[]> {
         return await this.bookService.getAll();
     }
 
@@ -17,18 +17,18 @@ export class BookController{
         return await this.bookService.getById(id);
     }
 
-    @Get('author/:id')
-    async getBooksByAuthor(@Param('id') id: string): Promise<BookEntity>{
-        return await this.bookService.getBooksByAuthor(id);
+    @Get('author/:authorId')
+    async getBooksByAuthor(@Param('authorId') authorId: string): Promise<BookEntity[]>{
+        return await this.bookService.getBooksByAuthor(authorId);
     }
 
     @Post()
-    async createBook(@Body() bookData: CreateBookDto): Promise<BookEntity>{
+    async createBook(@Body() bookData: Partial<CreateBookDto>): Promise<BookEntity>{
         return await this.bookService.createBook(bookData);
     }
 
     @Put(':id')
-    async updateBook(@Param('id') id: string, @Body() bookData: CreateBookDto): Promise<BookEntity>{
+    async updateBook(@Param('id') id: string, @Body() bookData: Partial<UpdateBookDto>): Promise<BookEntity>{
         return await this.bookService.updateBook(id, bookData);
     }
 

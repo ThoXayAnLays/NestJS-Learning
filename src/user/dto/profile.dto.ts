@@ -12,4 +12,6 @@ export class ProfileDto {
     @IsNotEmpty({ message: 'Last name is required' })
     @IsString({ message: 'Invalid last name' })
     lastName: string;
+
+    user: string;
 }

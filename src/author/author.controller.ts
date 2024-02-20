@@ -17,18 +17,13 @@ export class AuthorController {
         return await this.authorService.getById(id);
     }
 
-    @Get(':id/books')
-    async getBooksByAuthor(@Param('id') id: string): Promise<AuthorEntity> {
-        return await this.authorService.getBooksByAuthor(id);
-    }
-
     @Post()
-    async createAuthor(@Body() author: CreateAuthorDto): Promise<AuthorEntity> {
+    async createAuthor(@Body() author: Partial<CreateAuthorDto>): Promise<AuthorEntity> {
         return await this.authorService.createAuthor(author);
     }
 
     @Put(':id')
-    async updateAuthor(@Param('id') id: string, @Body() author: UpdateAuthorDto): Promise<AuthorEntity> {
+    async updateAuthor(@Param('id') id: string, @Body() author: Partial<UpdateAuthorDto>): Promise<AuthorEntity> {
         return await this.authorService.updateAuthor(id, author);
     }
 

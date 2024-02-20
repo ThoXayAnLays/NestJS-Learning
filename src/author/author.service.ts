@@ -7,7 +7,8 @@ import { CreateAuthorDto, UpdateAuthorDto } from "./dto";
 @Injectable()
 export class AuthorService{
     constructor(
-        @InjectRepository(AuthorEntity) private readonly authorRepository: Repository<AuthorEntity>
+        @InjectRepository(AuthorEntity) 
+        private readonly authorRepository: Repository<AuthorEntity>,
     ) {}
 
     async getAll(): Promise<AuthorEntity[]> {
@@ -18,16 +19,12 @@ export class AuthorService{
         return await this.authorRepository.findOne({ where: { id } });
     }
 
-    async getBooksByAuthor(id: string): Promise<AuthorEntity> {
-        return await this.authorRepository.findOne({ where: { id }, relations: ['books'] });
-    }
-
-    async createAuthor(author: CreateAuthorDto): Promise<AuthorEntity> {
+    async createAuthor(author: Partial<CreateAuthorDto>): Promise<AuthorEntity> {
         const newAuthor = this.authorRepository.create(author) as AuthorEntity;
         return await this.authorRepository.save(newAuthor);
     }
 
-    async updateAuthor(id: string, author: UpdateAuthorDto): Promise<AuthorEntity> {
+    async updateAuthor(id: string, author: Partial<UpdateAuthorDto>): Promise<AuthorEntity> {
         await this.authorRepository.update(id, author);
         const updatedAuthor = await this.authorRepository.findOne({ where: { id }, relations: {books: true} });
         if (!updatedAuthor) {

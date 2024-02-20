@@ -9,7 +9,7 @@ export class BookEntity{
 
     @Column() 
     @IsNotEmpty()  
-    title: string;
+    bookTitle: string;
 
     @Column()
     @IsNotEmpty()

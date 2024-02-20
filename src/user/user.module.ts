@@ -16,11 +16,13 @@ import { TwoFactorAuthenticationService } from './services/twoFactorAuth.service
 import { JwtStrategy } from './jwt.strategy';
 import { JwtTwoFactorStrategy } from './jwtTwoFactor.strategy';
 import { TwoFactorAuthenticationController } from './controllers/twoFactorAuthentication.controller';
+import { ProfileService } from './services/profile.service';
+import { ProfileEntity } from 'src/entities/profiles.entity';
 
 @Module({
     imports: [
         ConfigModule.forRoot(),
-        TypeOrmModule.forFeature([UserEntity]),
+        TypeOrmModule.forFeature([UserEntity, ProfileEntity]),
         
         PassportModule.register({
             defaultStrategy: 'jwt',
@@ -50,11 +52,12 @@ import { TwoFactorAuthenticationController } from './controllers/twoFactorAuthen
         UserService, 
         AuthService,
         JwtStrategy,
+        ProfileService,
         TwoFactorAuthenticationService,
         JwtTwoFactorStrategy,
         //EmailConsumer
     ],
-    exports: [UserService, AuthService],
+    exports: [UserService, AuthService, ProfileService],
 })
 
 export class UsersModule {}
