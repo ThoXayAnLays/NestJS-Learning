@@ -1,5 +1,4 @@
 import { Body, ClassSerializerInterceptor, Controller, Delete, Get, Param, Post, Put, UseGuards, UseInterceptors } from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
 import { CreateGenreDto, UpdateGenreDto } from "./dto";
 import GenreService from "./genre.service";
 import { GenreEntity } from "src/entities/genres.entity";

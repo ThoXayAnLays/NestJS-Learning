@@ -13,10 +13,10 @@ export class EmailConsumer {
         await this.mailerService.sendMail({
             to: job.data['to'],
             subject: 'Welcome to my website',
-            template: './welcome',
+            template: './confirmation',
             context: {
                 name: job.data['name'],
-        },
+            },
         });
         const time2 = new Date();
         console.log('Send Success: ', time2.getTime() - time1.getTime(), 'ms');

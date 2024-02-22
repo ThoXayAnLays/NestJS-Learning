@@ -20,6 +20,9 @@ export class UserEntity{
     @IsOptional()
     refreshToken: string;
 
+    @Column({ default: 'User'})
+    roles: string;
+
     @Column()
     @IsOptional()
     twoFactorAuthSecret: string;

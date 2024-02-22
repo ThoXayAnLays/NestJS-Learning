@@ -10,9 +10,9 @@ export class JwtTwoFactorStrategy extends PassportStrategy(
 ) {
     constructor(private readonly authService: AuthService) {
         super({
-        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-        secretOrKey: process.env.AT_SECRET,
-        ignoreExpiration: true,
+            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+            secretOrKey: process.env.AT_SECRET,
+            ignoreExpiration: true,
         });
     }
 

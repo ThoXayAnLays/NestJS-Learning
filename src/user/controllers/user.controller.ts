@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, Param, UseGuards, Post, Put, Req, BadRequestException, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, UseGuards, Post, Put, Req, BadRequestException, UploadedFile, UseInterceptors, SetMetadata } from "@nestjs/common";
 import { UserDto } from "../dto";
-import { AuthGuard } from '@nestjs/passport';
+import { AuthGuard } from 'src/user/auth.guard';
 import { UserService } from "../services/user.service";
 
 import { ProfileDto } from "../dto";
@@ -9,43 +9,40 @@ import { ProfileService } from "../services/profile.service";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { storageCongif } from "src/helpers/config";
 import { extname } from "path";
+import { Roles } from "src/user/decorator/roles.decorator";
 
 @Controller('users')
 export class UserController {
     constructor(private readonly userService: UserService, private readonly profileService: ProfileService) {}
 
-    @UseGuards(AuthGuard())
     @Get('profile')
     async getProfile(@Req() req: any) {
         return await this.profileService.getByUserId(req.user.id);
     }
 
     @Get('profile/getall')
-    @UseGuards(AuthGuard())
+    //@SetMetadata('roles', ['Admin'])
+    @Roles('Admin')
     async getAll(): Promise<ProfileEntity[]> {
         return await this.profileService.getAll();
     }
 
-    @UseGuards(AuthGuard())
     @Post('profile')
     async createProfile(@Req() req: any, @Body() profile: ProfileDto): Promise<ProfileEntity> {
         return await this.profileService.createProfile(req.user.id, profile);
     }
 
-    @UseGuards(AuthGuard())
     @Put('profile/update')
     async updateProfile(@Req() req: any, @Body() profile: ProfileDto): Promise<ProfileEntity> {
         return await this.profileService.updateProfile(req.user.id, profile);
     }
 
-    @UseGuards(AuthGuard())
     @Delete('profile/delete')
     async deleteProfile(@Req() req: any): Promise<void> {
         return await this.profileService.deleteProfile(req.user.id);
     }
 
     @Post('profile/upload-avatar')
-    @UseGuards(AuthGuard())
     @UseInterceptors(FileInterceptor(
         'avatar',
         {

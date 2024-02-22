@@ -10,6 +10,8 @@ import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { Cron, CronExpression, SchedulerRegistry } from "@nestjs/schedule";
 import { InjectQueue } from "@nestjs/bull";
 import { Queue } from "bull";
+import { MailerService } from "@nestjs-modules/mailer";
+import { MESSAGES } from "@nestjs/core/constants";
 
 @Injectable()
 export class UserService {
@@ -17,8 +19,9 @@ export class UserService {
         @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
         //private readonly eventEmitter: EventEmitter2,
         // private scheduleRegistry: SchedulerRegistry,
-        // @InjectQueue('send-mail') 
-        // private sendMail: Queue,
+        @InjectQueue('send-mail') 
+        private sendMail: Queue,
+        private mailerService: MailerService,
     ) {}
 
     // getHello(): string {
@@ -34,15 +37,29 @@ export class UserService {
             throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
         }
 
+        try{
+            await this.mailerService.sendMail({
+                to: userDto.email,
+                subject: 'Welcome to NestJS!',
+                template: './confirmation',
+                context: {
+                    name: userDto.userName
+                }
+            });
+            console.log('Email sent!', userDto.email);
+        }catch(e){
+            throw new HttpException('Email not sent', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
         // await this.sendMail.add(
-        //     'register',
+        //     'register', 
         //     {
-        //         to: userDto.email,
-        //         firstName: userDto.firstName,
-        //     },
+        //         'to': userDto.email,
+        //         'name': userDto.userName,
+        //     }, 
         //     {
         //         removeOnComplete: true,
-        //     },
+        //     }
         // );
 
         return await this.userRepository.create(userDto);

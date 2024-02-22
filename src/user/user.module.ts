@@ -39,9 +39,9 @@ import { ProfileEntity } from 'src/entities/profiles.entity';
             }),
             inject: [ConfigService],
         }),
-        // BullModule.registerQueue({
-        //     name: 'send-mail',
-        // }),
+        BullModule.registerQueue({
+            name: 'send-mail',
+        }),
     ],
     controllers: [
         UserController,
@@ -55,9 +55,9 @@ import { ProfileEntity } from 'src/entities/profiles.entity';
         ProfileService,
         TwoFactorAuthenticationService,
         JwtTwoFactorStrategy,
-        //EmailConsumer
+        EmailConsumer
     ],
-    exports: [UserService, AuthService, ProfileService],
+    exports: [UserService, AuthService, ProfileService, JwtModule],
 })
 
 export class UsersModule {}

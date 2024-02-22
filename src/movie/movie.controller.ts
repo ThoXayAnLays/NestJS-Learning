@@ -1,5 +1,4 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
 import { CreateMovieDto, UpdateMovieDto } from "./dto";
 import MovieService from "./movie.service";
 import { MovieEntity } from "src/entities/movies.entity";
