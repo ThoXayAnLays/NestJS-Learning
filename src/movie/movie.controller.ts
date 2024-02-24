@@ -2,7 +2,9 @@ import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nes
 import { CreateMovieDto, UpdateMovieDto } from "./dto";
 import MovieService from "./movie.service";
 import { MovieEntity } from "src/entities/movies.entity";
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags('Movies')
 @Controller('movies')
 export default class MovieController {
     constructor(

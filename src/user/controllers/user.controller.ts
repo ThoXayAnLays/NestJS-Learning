@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, UseGuards, Post, Put, Req, BadRequestException, UploadedFile, UseInterceptors, SetMetadata } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, UseGuards, Post, Put, Req, BadRequestException, UploadedFile, UseInterceptors, SetMetadata, Query } from "@nestjs/common";
 import { UserDto } from "../dto";
 import { AuthGuard } from 'src/user/auth.guard';
 import { UserService } from "../services/user.service";
@@ -10,7 +10,12 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { storageCongif } from "src/helpers/config";
 import { extname } from "path";
 import { Roles } from "src/user/decorator/roles.decorator";
+import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
+import { FilterProfileDto } from "../dto/filter-profile.dto";
+import { Public } from "../decorator/public.decorator";
 
+@ApiBearerAuth()
+@ApiTags('Users')
 @Controller('users')
 export class UserController {
     constructor(private readonly userService: UserService, private readonly profileService: ProfileService) {}
@@ -20,11 +25,15 @@ export class UserController {
         return await this.profileService.getByUserId(req.user.id);
     }
 
+    //@Roles('Admin')
+    @ApiQuery({ name: 'page'})
+    @ApiQuery({ name: 'item_per_page'})
+    @ApiQuery({ name: 'search'})
+    @Public()
     @Get('profile/getall')
-    //@SetMetadata('roles', ['Admin'])
-    @Roles('Admin')
-    async getAll(): Promise<ProfileEntity[]> {
-        return await this.profileService.getAll();
+    async getAll(@Query() query: FilterProfileDto): Promise<ProfileEntity[]> {
+        console.log(query)
+        return await this.profileService.getAll(query);
     }
 
     @Post('profile')

@@ -12,6 +12,8 @@ import { TwoFactorAuthenticationService } from '../services/twoFactorAuth.servic
 import { UserService } from '../services/user.service';
 import { AuthService } from '../services/auth.service';
 import { AuthGuard } from '@nestjs/passport';
+import { Public } from '../decorator/public.decorator';
+import { Roles } from '../decorator/roles.decorator';
 
 @Controller('2fa')
 export class TwoFactorAuthenticationController {
@@ -21,20 +23,22 @@ export class TwoFactorAuthenticationController {
         private authService: AuthService,
     ) {}
 
+    @Public()
     @Post('generate')
     @UseGuards(AuthGuard('jwt'))
     async generate(@Res() response: any, @Req() request: any) {
         const { otpAuthUrl } =
-        await this.twoFactorAuthenticationService.generateTwoFactorAuthenticationSecret(
+            await this.twoFactorAuthenticationService.generateTwoFactorAuthenticationSecret(
             request.user,
-        );
+            );
         console.log(otpAuthUrl);
         return this.twoFactorAuthenticationService.pipeQrCodeStream(
-        response,
-        otpAuthUrl,
+            response,
+            otpAuthUrl,
         );
     }
 
+    @Public()
     @Post('turn-on')
     @HttpCode(200)
     @UseGuards(AuthGuard('jwt'))
@@ -42,16 +46,17 @@ export class TwoFactorAuthenticationController {
         await this.userService.turnOnTwoFactorAuth(request.user._id);
     }
 
+    @Public()
     @Post('authenticate')
     @UseGuards(AuthGuard('jwt'))
     async authentication(@Req() request: any, @Body('code') code) {
         const isCodeValid =
-        await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
+            await this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
             code,
             request.user,
-        );
+            );
         if (!isCodeValid) {
-        throw new UnauthorizedException('Wrong authentication code');
+            throw new UnauthorizedException('Wrong authentication code');
         }
         return this.authService.getAccess2FA(request.user);
     }

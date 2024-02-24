@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, SetMetadata, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Req, SetMetadata, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { UserDto, LoginUserDto } from 'src/user/dto/user.dto';
 import { AuthService } from '../services/auth.service';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -11,6 +11,8 @@ export class AuthController {
 
     @Post('register')
     //@SetMetadata('isPublic', true)
+    @ApiResponse({status:201, description:'Register successfully!'})
+    @ApiResponse({status:401, description:'Register fail!'})
     @Public()
     async register(@Body() createUserDto: UserDto) {
         return await this.authService.register(createUserDto);
@@ -21,6 +23,7 @@ export class AuthController {
     @Public()
     @ApiResponse({status:201, description:'Login successfully!'})
     @ApiResponse({status:401, description:'Login fail!'})
+    @UsePipes(ValidationPipe)
     async login(@Body() loginUserDto: LoginUserDto) {
         return await this.authService.login(loginUserDto);
     }
@@ -28,11 +31,15 @@ export class AuthController {
     @Post('refresh')
     //@SetMetadata('isPublic', true)
     @Public()
+    @ApiResponse({status:201, description:'Get Refresh Token successfully!'})
+    @ApiResponse({status:401, description:'Get Refresh Token fail!'})
     async refresh(@Body() body) {
         return await this.authService.refresh(body.refresh_token);
     }
 
     @Post('logout')
+    @ApiResponse({status:200, description:'Logout successfully!'})
+    @ApiResponse({status:401, description:'Logout fail!'})
     async logout(@Req() req: any) {
         await this.authService.logout(req.user);
         return {

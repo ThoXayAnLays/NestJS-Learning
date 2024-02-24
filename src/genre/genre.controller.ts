@@ -2,7 +2,9 @@ import { Body, ClassSerializerInterceptor, Controller, Delete, Get, Param, Post,
 import { CreateGenreDto, UpdateGenreDto } from "./dto";
 import GenreService from "./genre.service";
 import { GenreEntity } from "src/entities/genres.entity";
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags('Genres')
 @Controller('genres')
 @UseInterceptors(ClassSerializerInterceptor)
 export default class GenreController {

@@ -1,9 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ProfileEntity } from "src/entities/profiles.entity";
-import { Repository, UpdateResult } from "typeorm";
+import { Like, Repository, UpdateResult } from "typeorm";
 import { ProfileDto } from "../dto";
 import { UserEntity } from "src/entities/users.entity";
+import { FilterProfileDto } from "../dto/filter-profile.dto";
 
 @Injectable()
 export class ProfileService{
@@ -14,8 +15,35 @@ export class ProfileService{
         private readonly userRepository: Repository<UserEntity>
     ){}
 
-    async getAll(): Promise<ProfileEntity[]> {
-        return await this.profileRepository.find();
+    async getAll(query: FilterProfileDto): Promise<any> {
+        const item_per_page = Number(query.item_per_page) || 10;
+        const page = Number(query.page) || 1;
+        const skip = (page - 1) * item_per_page;
+        const search = query.search || '';
+
+        const [res, total] = await this.profileRepository.findAndCount({
+            where: [
+                { firstName: Like('%' + search + '%') },
+                { lastName: Like('%' + search + '%') }
+            ],
+            take: item_per_page,
+            skip: skip,
+            select: ['id', 'firstName', 'lastName', 'avatar', 'userId']
+        });
+        const lastPage = Math.ceil(total / item_per_page);
+        const nextPage = page + 1 > lastPage ? null : page + 1;
+        const prevPage = page - 1 < 1 ? null : page - 1;
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        return{
+            data: res,
+            total,
+            currentPage: page,
+            nextPage,
+            prevPage,
+            lastPage
+        }
     }
 
     async getByUserId(userId: string): Promise<ProfileEntity> {
