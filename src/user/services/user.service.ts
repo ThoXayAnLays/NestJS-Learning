@@ -2,16 +2,15 @@ import { Injectable, HttpException, HttpStatus } from "@nestjs/common";
 import { LoginUserDto, UserDto } from "../dto";
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
-import { UserEntity } from "src/entities/users.entity";
 import { plainToInstance } from "class-transformer";
 import * as bcrypt from 'bcrypt';
+import { UserEntity } from "../../../src/entities/users.entity";
 
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { Cron, CronExpression, SchedulerRegistry } from "@nestjs/schedule";
 import { InjectQueue } from "@nestjs/bull";
 import { Queue } from "bull";
 import { MailerService } from "@nestjs-modules/mailer";
-import { MESSAGES } from "@nestjs/core/constants";
 
 @Injectable()
 export class UserService {

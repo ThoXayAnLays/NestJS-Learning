@@ -7,9 +7,6 @@ import {
 } from 'class-validator';
 
 export class UserDto {
-    @Expose()
-    id: string;
-
     @IsNotEmpty({ message: 'Username is required' })
     @IsString({ message: 'Invalid username' })
     @ApiProperty()
@@ -27,9 +24,6 @@ export class UserDto {
 }
 
 export class LoginUserDto {
-    @Expose()
-    id: string;
-    
     @IsNotEmpty({ message: 'Email is required' })  
     @ApiProperty()
     email: string;

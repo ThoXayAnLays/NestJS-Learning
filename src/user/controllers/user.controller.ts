@@ -7,7 +7,7 @@ import { ProfileDto } from "../dto";
 import { ProfileEntity } from "src/entities/profiles.entity";
 import { ProfileService } from "../services/profile.service";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { storageCongif } from "src/helpers/config";
+import { storageCongif } from "../../../src/helpers/config";
 import { extname } from "path";
 import { Roles } from "src/user/decorator/roles.decorator";
 import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";

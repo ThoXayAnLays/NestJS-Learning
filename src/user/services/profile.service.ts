@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ProfileEntity } from "src/entities/profiles.entity";
+import { ProfileEntity } from "../../../src/entities/profiles.entity";
 import { Like, Repository, UpdateResult } from "typeorm";
 import { ProfileDto } from "../dto";
-import { UserEntity } from "src/entities/users.entity";
+import { UserEntity } from "../../../src/entities/users.entity";
 import { FilterProfileDto } from "../dto/filter-profile.dto";
 
 @Injectable()

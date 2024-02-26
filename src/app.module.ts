@@ -20,9 +20,11 @@ import { GenreEntity } from './entities/genres.entity';
 import { MovieEntity } from './entities/movies.entity';
 import { AuthorEntity } from './entities/authors.entity';
 import { BookEntity } from './entities/books.entity';
-import { EventGateway } from './event.gateway';
+import { EventGateway } from './websockets/event.gateway';
 import { RolesGuard } from './user/roles.guard';
 import { AuthGuard } from './user/auth.guard';
+import { MessagesModule } from './messages/messages.module';
+
 
 @Module({
   imports: [
@@ -84,6 +86,7 @@ import { AuthGuard } from './user/auth.guard';
       }),
       inject: [ConfigService],
     }),
+    MessagesModule,
   ],
   providers: [
     EventGateway,
@@ -94,7 +97,7 @@ import { AuthGuard } from './user/auth.guard';
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
-    }
+    },
   ],
 })
 export class AppModule {

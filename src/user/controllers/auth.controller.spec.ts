@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "../services/auth.service";
-import { UserDto } from "../dto";
+import { UserDto } from "../../../src/user/dto/user.dto";
 import { HttpStatus } from "@nestjs/common";
 
 describe('AuthController', () => {
@@ -36,7 +36,7 @@ describe('AuthController', () => {
             const createUserDto: UserDto = {
                 userName: 'test',
                 email: 'test@gmail.com',
-                password: '12345',
+                password: '12345'
             };
             //jest.spyOn(authService, 'register').mockResolvedValue(createUserDto);
 
