@@ -2,7 +2,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Server, Socket } from "socket.io";
 import { AuthService } from "../user/services/auth.service";
 
-@WebSocketGateway()
+@WebSocketGateway(50, {namespace: '/events'})
 export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect{
     @WebSocketServer()
     server: Server;

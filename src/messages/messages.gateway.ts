@@ -5,7 +5,7 @@ import { UpdateMessageDto } from './dto/update-message.dto';
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
-  corss:{
+  cors :{
     origin:'*'
   }
 })
