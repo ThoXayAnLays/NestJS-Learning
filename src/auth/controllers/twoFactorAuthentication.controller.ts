@@ -9,11 +9,10 @@ import {
     UseGuards,
 } from '@nestjs/common';
 import { TwoFactorAuthenticationService } from '../services/twoFactorAuth.service';
-import { UserService } from '../services/user.service';
+import { UserService } from '../../user/services/user.service';
 import { AuthService } from '../services/auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Public } from '../decorator/public.decorator';
-import { Roles } from '../decorator/roles.decorator';
 
 @Controller('2fa')
 export class TwoFactorAuthenticationController {

@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { UserService } from './user.service';
-import { UserDto, LoginUserDto } from '../dto/user.dto';
+import { UserService } from '../../user/services/user.service';
+import { UserDto, LoginUserDto } from '../../user/dto/user.dto';
 import { JwtService } from '@nestjs/jwt';
-import { UserEntity } from 'src/entities/users.entity';
+import { UserEntity } from 'src/user/entities/users.entity';
 import { ExtractJwt } from 'passport-jwt';
 import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -132,10 +132,10 @@ export class AuthService{
         }
     }
 
-    async logout(user: UserEntity){
+    async logout(userId: string){
         return this.userService.update(
-            { email: user.email },
-            {refreshToken: null}
+            { id: userId},
+            { refreshToken: null }
         )
     }
 }

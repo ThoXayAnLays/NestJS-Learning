@@ -1,23 +1,21 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from 'src/user/entities/users.entity';
-import { UserController } from './controllers/user.controller';
-import { UserService } from './services/user.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-
-
-import { BullModule } from '@nestjs/bull';
-import { EmailConsumer } from './consumers/email.consumer';
-import { ProfileService } from './services/profile.service';
-import { ProfileEntity } from 'src/user/entities/profiles.entity';
+import { AuthController } from './controllers/auth.controller';
+import { TwoFactorAuthenticationController } from './controllers/twoFactorAuthentication.controller';
+import { AuthService } from './services/auth.service';
+import { JwtTwoFactorStrategy } from './strategies/jwtTwoFactor.strategy';
+import { TwoFactorAuthenticationService } from './services/twoFactorAuth.service';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { UsersModule } from 'src/user/user.module';
+import { UserEntity } from 'src/user/entities/users.entity';
 
 @Module({
     imports: [
         ConfigModule.forRoot(),
-        TypeOrmModule.forFeature([UserEntity, ProfileEntity]),
-        
+        TypeOrmModule.forFeature([UserEntity]),
         PassportModule.register({
             defaultStrategy: 'jwt',
             property: 'user',
@@ -33,19 +31,19 @@ import { ProfileEntity } from 'src/user/entities/profiles.entity';
             }),
             inject: [ConfigService],
         }),
-        BullModule.registerQueue({
-            name: 'send-mail',
-        }),
+        UsersModule
     ],
     controllers: [
-        UserController,
+        AuthController,
+        TwoFactorAuthenticationController,
     ],
     providers: [
-        UserService, 
-        ProfileService,
-        EmailConsumer
+        AuthService,
+        JwtStrategy,
+        TwoFactorAuthenticationService,
+        JwtTwoFactorStrategy,
     ],
-    exports: [UserService, ProfileService],
+    exports: [AuthService, JwtModule],
 })
 
-export class UsersModule {}
+export class AuthModule {}

@@ -1,31 +1,30 @@
 import { Body, Controller, Delete, Get, Param, UseGuards, Post, Put, Req, BadRequestException, UploadedFile, UseInterceptors, SetMetadata, Query } from "@nestjs/common";
-import { UserDto } from "../dto";
-import { AuthGuard } from 'src/user/auth.guard';
 import { UserService } from "../services/user.service";
 
 import { ProfileDto } from "../dto";
-import { ProfileEntity } from "src/entities/profiles.entity";
+import { ProfileEntity } from "src/user/entities/profiles.entity";
 import { ProfileService } from "../services/profile.service";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { storageCongif } from "../../../src/helpers/config";
 import { extname } from "path";
-import { Roles } from "src/user/decorator/roles.decorator";
 import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { FilterProfileDto } from "../dto/filter-profile.dto";
-import { Public } from "../decorator/public.decorator";
+import { Public } from "../../auth/decorator/public.decorator";
+import { Roles } from "src/auth/decorator/roles.decorator";
 
 @ApiBearerAuth()
 @ApiTags('Users')
-@Controller('users')
+@Controller('api/users')
 export class UserController {
     constructor(private readonly userService: UserService, private readonly profileService: ProfileService) {}
 
+    @Public()
     @Get('profile')
     async getProfile(@Req() req: any) {
-        return await this.profileService.getByUserId(req.user.id);
+        return await this.profileService.getByUserId(req.user);
     }
 
-    //@Roles('Admin')
+    @Roles('Admin')
     @ApiQuery({ name: 'page'})
     @ApiQuery({ name: 'item_per_page'})
     @ApiQuery({ name: 'search'})
@@ -36,21 +35,26 @@ export class UserController {
         return await this.profileService.getAll(query);
     }
 
+    @Public()
     @Post('profile')
     async createProfile(@Req() req: any, @Body() profile: ProfileDto): Promise<ProfileEntity> {
-        return await this.profileService.createProfile(req.user.id, profile);
+        return await this.profileService.createProfile(req.user, profile);
     }
 
+    @Public()
     @Put('profile/update')
     async updateProfile(@Req() req: any, @Body() profile: ProfileDto): Promise<ProfileEntity> {
-        return await this.profileService.updateProfile(req.user.id, profile);
+        return await this.profileService.updateProfile(req.user, profile);
     }
+
 
     @Delete('profile/delete')
+    @Public()
     async deleteProfile(@Req() req: any): Promise<void> {
-        return await this.profileService.deleteProfile(req.user.id);
+        return await this.profileService.deleteProfile(req.user);
     }
 
+    @Public()
     @Post('profile/upload-avatar')
     @UseInterceptors(FileInterceptor(
         'avatar',
@@ -84,6 +88,6 @@ export class UserController {
         if(!file){
             throw new BadRequestException('File is required')
         }
-        return await this.profileService.uploadAvatar(req.user.id, file.destination + '/' + file.filename);
+        return await this.profileService.uploadAvatar(req.user, file.destination + '/' + file.filename);
     }
 }

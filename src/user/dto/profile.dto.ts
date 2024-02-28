@@ -13,5 +13,6 @@ export class ProfileDto {
     @ApiProperty()
     lastName: string;
 
-    user: string;
+    // @IsNotEmpty({ message: 'User is required' })
+    // user: string;
 }

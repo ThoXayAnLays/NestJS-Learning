@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { MovieEntity } from "src/entities/movies.entity";
+import { MovieEntity } from "src/movie/entities/movies.entity";
 import { Repository } from "typeorm";
 import { CreateMovieDto, UpdateMovieDto } from "./dto";
 import { MovieNotFoundException } from "./exceptions/movieNotFound.exception";

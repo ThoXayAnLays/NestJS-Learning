@@ -5,7 +5,7 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from '../decorator/public.decorator';
 
 @ApiTags('Auth')
-@Controller('auth')
+@Controller('api/auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
@@ -38,12 +38,13 @@ export class AuthController {
     }
 
     @Post('logout')
+    @Public()
     @ApiResponse({status:200, description:'Logout successfully!'})
     @ApiResponse({status:401, description:'Logout fail!'})
     async logout(@Req() req: any) {
         await this.authService.logout(req.user);
         return {
-        statusCode: 200,
+            statusCode: 200,
         };
     }
 }

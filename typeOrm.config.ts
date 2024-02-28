@@ -2,13 +2,13 @@ import { ConfigService } from '@nestjs/config';
 import { config } from 'dotenv';
 import { CategoriesEntity } from 'src/entities/categories.entity';
 import { ProductsEntity } from 'src/entities/products.entity';
-import { UserEntity } from './src/entities/users.entity';
+import { UserEntity } from './src/user/entities/users.entity';
 import { DataSource } from 'typeorm';
-import { ProfileEntity } from 'src/entities/profiles.entity';
-import { GenreEntity } from 'src/entities/genres.entity';
-import { MovieEntity } from 'src/entities/movies.entity';
-import { AuthorEntity } from 'src/entities/authors.entity';
-import { BookEntity } from 'src/entities/books.entity';
+import { ProfileEntity } from 'src/user/entities/profiles.entity';
+import { GenreEntity } from 'src/genre/entities/genres.entity';
+import { MovieEntity } from 'src/movie/entities/movies.entity';
+import { AuthorEntity } from 'src/author/entities/authors.entity';
+import { BookEntity } from 'src/book/entities/books.entity';
 
 
 config();

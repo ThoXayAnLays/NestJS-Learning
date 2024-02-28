@@ -1,6 +1,6 @@
 import { IsNotEmpty } from "class-validator";
 import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
-import { GenreEntity } from "./genres.entity";
+import { GenreEntity } from "../../genre/entities/genres.entity";
 
 @Entity('movies')
 export class MovieEntity{

@@ -4,7 +4,7 @@ import { Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { plainToInstance } from "class-transformer";
 import * as bcrypt from 'bcrypt';
-import { UserEntity } from "../../../src/entities/users.entity";
+import { UserEntity } from "src/user/entities/users.entity";
 
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { Cron, CronExpression, SchedulerRegistry } from "@nestjs/schedule";

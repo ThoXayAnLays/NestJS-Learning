@@ -4,7 +4,7 @@ import { Reflector } from "@nestjs/core";
 import { JwtService } from "@nestjs/jwt";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Request } from 'express';
-import { UserEntity } from "src/entities/users.entity";
+import { UserEntity } from "src/user/entities/users.entity";
 import { Repository } from "typeorm";
 
 @Injectable()

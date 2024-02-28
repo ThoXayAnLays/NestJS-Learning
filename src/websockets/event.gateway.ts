@@ -1,6 +1,6 @@
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-import { AuthService } from "../user/services/auth.service";
+import { AuthService } from "src/auth/services/auth.service";
 
 @WebSocketGateway(50, {namespace: '/events'})
 export class EventGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect{

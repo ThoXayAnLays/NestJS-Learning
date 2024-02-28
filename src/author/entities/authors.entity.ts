@@ -1,6 +1,6 @@
 import { IsNotEmpty } from "class-validator";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { BookEntity } from "./books.entity";
+import { BookEntity } from "../../book/entities/books.entity";
 
 @Entity('authors')
 export class AuthorEntity{

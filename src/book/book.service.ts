@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { BookEntity } from "src/entities/books.entity";
+import { BookEntity } from "src/book/entities/books.entity";
 import { DeepPartial, Repository } from "typeorm";
 import { CreateBookDto, UpdateBookDto } from "./dto";
-import { AuthorEntity } from "src/entities/authors.entity";
+import { AuthorEntity } from "src/author/entities/authors.entity";
 
 @Injectable()
 export class BookService{

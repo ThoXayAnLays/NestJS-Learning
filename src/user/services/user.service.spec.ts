@@ -1,6 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { UserService } from "./user.service";
-import { UserEntity } from "../../../src/entities/users.entity";
+import { UserEntity } from "src/user/entities/users.entity";
 import { getRepositoryToken } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import * as bcrypt from 'bcrypt';

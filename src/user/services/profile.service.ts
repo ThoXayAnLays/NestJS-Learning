@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ProfileEntity } from "../../../src/entities/profiles.entity";
+import { ProfileEntity } from "../entities/profiles.entity";
 import { Like, Repository, UpdateResult } from "typeorm";
 import { ProfileDto } from "../dto";
-import { UserEntity } from "../../../src/entities/users.entity";
+import { UserEntity } from "src/user/entities/users.entity";
 import { FilterProfileDto } from "../dto/filter-profile.dto";
 
 @Injectable()
@@ -52,13 +52,13 @@ export class ProfileService{
         return profile;
     }
 
-    async createProfile(userId: string, profileData: ProfileDto): Promise<ProfileEntity> {
-        const userData = await this.userRepository.findOne({ where: { id: userId } });
-        if(!userData) throw new Error('User not found');
+    async createProfile(user_id: string, profileData: ProfileDto): Promise<ProfileEntity> {
+        const userData = await this.userRepository.findOne({ where: { id: user_id } });
+        if (!userData) throw new Error('User not found');
         const profile = new ProfileEntity();
         profile.firstName = profileData.firstName;
         profile.lastName = profileData.lastName;
-        profile.userId = userId;
+        profile.user = userData;
         return this.profileRepository.save(profile);
     }
 
@@ -66,11 +66,10 @@ export class ProfileService{
         const profile = await this.profileRepository.findOne({ where: { user: { id: userId } } });
         if(!profile) throw new Error('Profile not found');
         
-        const { firstName, lastName, user } = profileData;
+        const { firstName, lastName } = profileData;
         const updatedProfileData = {
             firstName,
             lastName,
-            user: { id: user }
         };
         await this.profileRepository.update(profile.id, updatedProfileData);
         return await this.profileRepository.findOne({ where: { id: profile.id } });

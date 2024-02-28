@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
-import { ProductsModule } from './modules/products/product.modules';
 import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './user/user.module';
-import { UserEntity } from './entities/users.entity';
+import { UserEntity } from './user/entities/users.entity';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BullModule } from '@nestjs/bull';
@@ -15,20 +14,21 @@ import { GenreModule } from './genre/genre.module';
 import { MovieModule } from './movie/movie.module';
 import { AuthorModule } from './author/author.module';
 import { BookModule } from './book/book.module';
-import { ProfileEntity } from './entities/profiles.entity';
-import { GenreEntity } from './entities/genres.entity';
-import { MovieEntity } from './entities/movies.entity';
-import { AuthorEntity } from './entities/authors.entity';
-import { BookEntity } from './entities/books.entity';
+import { ProfileEntity } from './user/entities/profiles.entity';
+import { GenreEntity } from './genre/entities/genres.entity';
+import { MovieEntity } from './movie/entities/movies.entity';
+import { AuthorEntity } from './author/entities/authors.entity';
+import { BookEntity } from './book/entities/books.entity';
 import { EventGateway } from './websockets/event.gateway';
-import { RolesGuard } from './user/roles.guard';
-import { AuthGuard } from './user/auth.guard';
+import { RolesGuard } from './auth/guards/roles.guard';
+import { AuthGuard } from './auth/guards/auth.guard';
 import { MessagesModule } from './messages/messages.module';
+import { AuthModule } from './auth/auth.module';
 
 
 @Module({
   imports: [
-    ProductsModule, 
+    AuthModule,
     UsersModule,
     GenreModule,
     MovieModule,

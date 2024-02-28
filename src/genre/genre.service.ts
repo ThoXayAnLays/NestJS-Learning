@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { GenreEntity } from "src/entities/genres.entity";
+import { GenreEntity } from "src/genre/entities/genres.entity";
 import { Repository } from "typeorm";
 import GenreNotFoundException from "./exceptions/genreNotFound.exception";
 import { CreateGenreDto, UpdateGenreDto } from "./dto";
