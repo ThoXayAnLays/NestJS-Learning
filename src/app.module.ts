@@ -24,6 +24,8 @@ import { RolesGuard } from './auth/guards/roles.guard';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { MessagesModule } from './messages/messages.module';
 import { AuthModule } from './auth/auth.module';
+import { GGAuthModule } from './google outh2/ggAuth.module';
+import { PassportModule } from '@nestjs/passport';
 
 
 @Module({
@@ -34,6 +36,9 @@ import { AuthModule } from './auth/auth.module';
     MovieModule,
     AuthorModule,
     BookModule,
+    GGAuthModule,
+    PassportModule.register({ session: true }),
+
     ConfigModule.forRoot(),
     TypeOrmModule.forFeature([UserEntity]),
     TypeOrmModule.forRoot({
@@ -90,14 +95,14 @@ import { AuthModule } from './auth/auth.module';
   ],
   providers: [
     EventGateway,
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: AuthGuard,
+    // },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: RolesGuard,
+    // },
   ],
 })
 export class AppModule {
