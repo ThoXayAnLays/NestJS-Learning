@@ -26,6 +26,7 @@ import { MessagesModule } from './messages/messages.module';
 import { AuthModule } from './auth/auth.module';
 import { GGAuthModule } from './google outh2/ggAuth.module';
 import { PassportModule } from '@nestjs/passport';
+import { OrderModule } from './microservices/order/order.module';
 
 
 @Module({
@@ -37,6 +38,7 @@ import { PassportModule } from '@nestjs/passport';
     AuthorModule,
     BookModule,
     GGAuthModule,
+    OrderModule,
     PassportModule.register({ session: true }),
 
     ConfigModule.forRoot(),

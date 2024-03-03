@@ -1,7 +1,5 @@
 import { ConfigService } from '@nestjs/config';
 import { config } from 'dotenv';
-import { CategoriesEntity } from 'src/entities/categories.entity';
-import { ProductsEntity } from 'src/entities/products.entity';
 import { UserEntity } from './src/user/entities/users.entity';
 import { DataSource } from 'typeorm';
 import { ProfileEntity } from 'src/user/entities/profiles.entity';
