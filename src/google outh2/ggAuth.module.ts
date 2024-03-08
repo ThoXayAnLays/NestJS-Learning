@@ -3,8 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from '../user/entities/users.entity';
 import { AuthController } from './ggAuth.controller';
 import { AuthService } from './ggAuth.service';
-import { GoogleStrategy } from './utils/GoogleStrategy';
-import { SessionSerializer } from './utils/Serializer';
+import { GoogleStrategy } from './utils/googleStrategy';
+import { SessionSerializer } from './utils/serializer';
 
 @Module({
     imports: [TypeOrmModule.forFeature([UserEntity])],

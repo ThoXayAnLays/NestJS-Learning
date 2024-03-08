@@ -4,7 +4,7 @@ interface User {
     email: string;
     password: string;
     refreshToken: string;
-    roles: string[];
+    types: string[];
 }
 export class UserRepository {
     private users: User[] = [];

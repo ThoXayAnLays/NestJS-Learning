@@ -11,6 +11,8 @@ import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { FilterProfileDto } from "../dto/filter-profile.dto";
 import { Public } from "../../auth/decorator/public.decorator";
 import { Roles } from "src/auth/decorator/roles.decorator";
+import { FilterUserDto } from "../dto/filter-user.dto";
+import { UserEntity } from "../entities/users.entity";
 
 @ApiBearerAuth()
 @ApiTags('Users')
@@ -18,17 +20,41 @@ import { Roles } from "src/auth/decorator/roles.decorator";
 export class UserController {
     constructor(private readonly userService: UserService, private readonly profileService: ProfileService) {}
 
+    //@Public()
+    //@Roles('Doctor')
+    @ApiQuery({ name: 'item_per_page'})
+    @ApiQuery({ name: 'page'})
+    @ApiQuery({ name: 'search'})
+    @Get()
+    async getAllUsers(@Query() query: FilterUserDto): Promise<UserEntity[]>{
+        try {
+            return await this.userService.getAllUsers(query);
+        } catch (error) {
+            return error;
+        }
+    }
+
+    @Public()
+    @Get(':id')
+    async getUserById(@Param('id') id:string): Promise<UserEntity>{
+        try {
+            return await this.userService.getUserById(id);
+        } catch (error) {
+            return error;
+        }
+    }
+
     @Public()
     @Get('profile')
     async getProfile(@Req() req: any) {
         return await this.profileService.getByUserId(req.user);
     }
 
-    @Roles('Admin')
+    @Roles('Doctor')
     @ApiQuery({ name: 'page'})
     @ApiQuery({ name: 'item_per_page'})
     @ApiQuery({ name: 'search'})
-    @Public()
+    //@Public()
     @Get('profile/getall')
     async getAll(@Query() query: FilterProfileDto): Promise<ProfileEntity[]> {
         console.log(query)

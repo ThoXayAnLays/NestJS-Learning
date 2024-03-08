@@ -4,10 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './controllers/auth.controller';
-import { TwoFactorAuthenticationController } from './controllers/twoFactorAuthentication.controller';
 import { AuthService } from './services/auth.service';
-import { JwtTwoFactorStrategy } from './strategies/jwtTwoFactor.strategy';
-import { TwoFactorAuthenticationService } from './services/twoFactorAuth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { UsersModule } from 'src/user/user.module';
 import { UserEntity } from 'src/user/entities/users.entity';
@@ -35,13 +32,10 @@ import { UserEntity } from 'src/user/entities/users.entity';
     ],
     controllers: [
         AuthController,
-        TwoFactorAuthenticationController,
     ],
     providers: [
         AuthService,
         JwtStrategy,
-        TwoFactorAuthenticationService,
-        JwtTwoFactorStrategy,
     ],
     exports: [AuthService, JwtModule],
 })

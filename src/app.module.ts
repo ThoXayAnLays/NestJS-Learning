@@ -27,6 +27,10 @@ import { AuthModule } from './auth/auth.module';
 import { GGAuthModule } from './google outh2/ggAuth.module';
 import { PassportModule } from '@nestjs/passport';
 import { OrderModule } from './microservices/order/order.module';
+import { UserToBookingSlotModule } from './user-to-booking-slot/user-to-booking-slot.module';
+import { UserToBookingSlotEntity } from './user-to-booking-slot/entity/user-to-booking-slot.ts';
+import { BookingSlotEntity } from './booking-slot/entities/booking-slot.entity';
+import { BookingSlotModule } from './booking-slot/booking-slot.module';
 
 
 @Module({
@@ -37,7 +41,9 @@ import { OrderModule } from './microservices/order/order.module';
     MovieModule,
     AuthorModule,
     BookModule,
-    GGAuthModule,
+    BookingSlotModule,
+    UserToBookingSlotModule,
+    //GGAuthModule,
     OrderModule,
     PassportModule.register({ session: true }),
 
@@ -50,7 +56,7 @@ import { OrderModule } from './microservices/order/order.module';
       username: 'postgres',
       password: '123',
       database: 'nestjs',
-      entities: [UserEntity, ProfileEntity, GenreEntity, MovieEntity, AuthorEntity, BookEntity/*ProductsEntity, CategoriesEntity*/],
+      entities: [UserEntity, BookingSlotEntity, UserToBookingSlotEntity, ProfileEntity, GenreEntity, MovieEntity, AuthorEntity, BookEntity],
       logger: 'advanced-console',
       logging: 'all',
       synchronize: true,
@@ -97,14 +103,14 @@ import { OrderModule } from './microservices/order/order.module';
   ],
   providers: [
     EventGateway,
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: AuthGuard,
-    // },
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: RolesGuard,
-    // },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
   ],
 })
 export class AppModule {

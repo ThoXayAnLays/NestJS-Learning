@@ -12,6 +12,7 @@ import { BullModule } from '@nestjs/bull';
 import { EmailConsumer } from './consumers/email.consumer';
 import { ProfileService } from './services/profile.service';
 import { ProfileEntity } from 'src/user/entities/profiles.entity';
+import { UserRepository } from './repositories/user.repository';
 
 @Module({
     imports: [
@@ -43,9 +44,10 @@ import { ProfileEntity } from 'src/user/entities/profiles.entity';
     providers: [
         UserService, 
         ProfileService,
+        UserRepository,
         EmailConsumer
     ],
-    exports: [UserService, ProfileService],
+    exports: [UserService, ProfileService, UserRepository],
 })
 
 export class UsersModule {}

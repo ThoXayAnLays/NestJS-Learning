@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from "@nestjs/common";
 import { LoginUserDto, UserDto } from "../dto";
-import { Repository } from "typeorm";
+import { Like, Repository } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { plainToInstance } from "class-transformer";
 import * as bcrypt from 'bcrypt';
@@ -11,6 +11,7 @@ import { Cron, CronExpression, SchedulerRegistry } from "@nestjs/schedule";
 import { InjectQueue } from "@nestjs/bull";
 import { Queue } from "bull";
 import { MailerService } from "@nestjs-modules/mailer";
+import { FilterUserDto } from "../dto/filter-user.dto";
 
 @Injectable()
 export class UserService {
@@ -96,17 +97,45 @@ export class UserService {
     //     await new Promise<void>((resolve) => setTimeout(() => resolve(), 3000));
     //     console.log('Email sent!');
     // }
+    
+    async getAllUsers(query: FilterUserDto): Promise<any>{
+        const item_per_page = Number(query.item_per_page) || 10;
+        const page = Number(query.page) || 1;
+        const skip = (page - 1) * item_per_page;
+        const search = query.search || '';
 
-    async setTwoFactoAuthSecret(secret, user_id){
-        return this.userRepository.update(user_id,{
-            twoFactorAuthSecret: secret,
-        })
+        const [res, total] = await this.userRepository.findAndCount({
+            where: [
+                { userName: Like('%' + search + '%') },
+                { email: Like('%' + search + '%') },
+                //{ types: Like('%' + search + '%') }
+            ],
+            take: item_per_page,
+            skip: skip,
+            select: ['id', 'userName', 'email']
+        });
+        const lastPage = Math.ceil(total / item_per_page);
+        const nextPage = page + 1 > lastPage ? null : page + 1;
+        const prevPage = page - 1 < 1 ? null : page - 1;
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        return{
+            data: res,
+            total,
+            currentPage: page,
+            nextPage,
+            prevPage,
+            lastPage
+        }
     }
 
-    async turnOnTwoFactorAuth(userId: string){
-        return this.userRepository.update(userId,{
-            isTwoFactorAuthenticationEnabled: true,
-        })
+    async getUserById(id:string): Promise<UserEntity>{
+        const result = await this.userRepository.findOne({where: {id: id}});
+        if(!result){
+            throw new HttpException('User not found', 404);
+        }
+        return result;
     }
 
     async update(filter, update) {

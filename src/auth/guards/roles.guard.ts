@@ -8,7 +8,7 @@ export class RolesGuard implements CanActivate{
     canActivate(context: ExecutionContext): boolean {
         console.log('RolesGuard');
 
-        const requiredRoles = this.reflector.getAllAndOverride<string[]>('roles', [
+        const requiredRoles = this.reflector.getAllAndOverride<string[]>('types', [
             context.getHandler(),
             context.getClass()
         ]);
@@ -18,6 +18,6 @@ export class RolesGuard implements CanActivate{
         console.log("requiredRoles => ", requiredRoles);
         const {user} = context.switchToHttp().getRequest();
         console.log("user => ", user);
-        return requiredRoles.some(role => user.roles.split('.').includes(role));
+        return requiredRoles.some(type => user.types.split('.').includes(type));
     }
 }

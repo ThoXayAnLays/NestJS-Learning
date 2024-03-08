@@ -29,6 +29,8 @@ async function bootstrap() {
   .setVersion('1.0')
   .addTag('Auth')
   .addTag('Users')
+  .addTag('BookingSlots')
+  .addTag('UserToBookingSlots')
   .addTag('Authors')
   .addTag('Books')
   .addTag('Genres')
