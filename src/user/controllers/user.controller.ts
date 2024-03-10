@@ -10,7 +10,7 @@ import { extname } from "path";
 import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { FilterProfileDto } from "../dto/filter-profile.dto";
 import { Public } from "../../auth/decorator/public.decorator";
-import { Roles } from "src/auth/decorator/roles.decorator";
+import { Types } from "src/auth/decorator/types.decorator";
 import { FilterUserDto } from "../dto/filter-user.dto";
 import { UserEntity } from "../entities/users.entity";
 
@@ -20,12 +20,12 @@ import { UserEntity } from "../entities/users.entity";
 export class UserController {
     constructor(private readonly userService: UserService, private readonly profileService: ProfileService) {}
 
-    //@Public()
-    //@Roles('Doctor')
+    @Public()
+    @Types('Doctor')
     @ApiQuery({ name: 'item_per_page'})
     @ApiQuery({ name: 'page'})
     @ApiQuery({ name: 'search'})
-    @Get()
+    @Get('getAll')
     async getAllUsers(@Query() query: FilterUserDto): Promise<UserEntity[]>{
         try {
             return await this.userService.getAllUsers(query);
@@ -35,10 +35,10 @@ export class UserController {
     }
 
     @Public()
-    @Get(':id')
-    async getUserById(@Param('id') id:string): Promise<UserEntity>{
+    @Get('getCurrentUser')
+    async getUserById(@Req() req:any): Promise<UserEntity>{
         try {
-            return await this.userService.getUserById(id);
+            return await this.userService.getUserById(req.user);
         } catch (error) {
             return error;
         }
@@ -50,7 +50,7 @@ export class UserController {
         return await this.profileService.getByUserId(req.user);
     }
 
-    @Roles('Doctor')
+    @Types('Doctor')
     @ApiQuery({ name: 'page'})
     @ApiQuery({ name: 'item_per_page'})
     @ApiQuery({ name: 'search'})

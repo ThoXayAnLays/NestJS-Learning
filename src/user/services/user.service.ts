@@ -107,12 +107,11 @@ export class UserService {
         const [res, total] = await this.userRepository.findAndCount({
             where: [
                 { userName: Like('%' + search + '%') },
-                { email: Like('%' + search + '%') },
-                //{ types: Like('%' + search + '%') }
+                { email: Like('%' + search + '%') }
             ],
             take: item_per_page,
             skip: skip,
-            select: ['id', 'userName', 'email']
+            select: ['id', 'userName', 'email', 'types']
         });
         const lastPage = Math.ceil(total / item_per_page);
         const nextPage = page + 1 > lastPage ? null : page + 1;

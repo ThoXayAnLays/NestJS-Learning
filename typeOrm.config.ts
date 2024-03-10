@@ -8,7 +8,7 @@ import { MovieEntity } from 'src/movie/entities/movies.entity';
 import { AuthorEntity } from 'src/author/entities/authors.entity';
 import { BookEntity } from 'src/book/entities/books.entity';
 import { BookingSlotEntity } from 'src/booking-slot/entities/booking-slot.entity';
-import { UserToBookingSlotEntity } from 'src/user-to-booking-slot/entity/user-to-booking-slot.ts';
+import { UserToBookingSlotEntity } from 'src/user-to-booking-slot/entity/user-to-booking-slot.entity';
 
 
 config();

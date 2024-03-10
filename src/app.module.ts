@@ -20,7 +20,7 @@ import { MovieEntity } from './movie/entities/movies.entity';
 import { AuthorEntity } from './author/entities/authors.entity';
 import { BookEntity } from './book/entities/books.entity';
 import { EventGateway } from './websockets/event.gateway';
-import { RolesGuard } from './auth/guards/roles.guard';
+import { TypesGuard } from './auth/guards/types.guard';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { MessagesModule } from './messages/messages.module';
 import { AuthModule } from './auth/auth.module';
@@ -28,7 +28,7 @@ import { GGAuthModule } from './google outh2/ggAuth.module';
 import { PassportModule } from '@nestjs/passport';
 import { OrderModule } from './microservices/order/order.module';
 import { UserToBookingSlotModule } from './user-to-booking-slot/user-to-booking-slot.module';
-import { UserToBookingSlotEntity } from './user-to-booking-slot/entity/user-to-booking-slot.ts';
+import { UserToBookingSlotEntity } from './user-to-booking-slot/entity/user-to-booking-slot.entity';
 import { BookingSlotEntity } from './booking-slot/entities/booking-slot.entity';
 import { BookingSlotModule } from './booking-slot/booking-slot.module';
 
@@ -60,6 +60,10 @@ import { BookingSlotModule } from './booking-slot/booking-slot.module';
       logger: 'advanced-console',
       logging: 'all',
       synchronize: true,
+    }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['.env'],
     }),
     // EventEmitterModule.forRoot(),
     // ScheduleModule.forRoot(),
@@ -109,7 +113,7 @@ import { BookingSlotModule } from './booking-slot/booking-slot.module';
     },
     {
       provide: APP_GUARD,
-      useClass: RolesGuard,
+      useClass: TypesGuard,
     },
   ],
 })

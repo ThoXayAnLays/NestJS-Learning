@@ -1,16 +1,19 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { DeepPartial, Like, Repository } from "typeorm";
-import { UserToBookingSlotEntity } from "../entity/user-to-booking-slot.ts";
-import { FilterUserToBookingSlotDto } from "../dto/filter-user-to-booking-slot.dto.js";
+import { UserToBookingSlotEntity } from "../entity/user-to-booking-slot.entity";
+import { FilterUserToBookingSlotDto } from "../dto/filter-user-to-booking-slot.dto";
 import { UserEntity } from "src/user/entities/users.entity";
-import { BookingSlotEntity } from "src/booking-slot/entities/booking-slot.entity.js";
-import { CreateUserToBookingSlotDto, UpdateUserToBookingSlotDto } from "../dto/user-to-booking-slot.dto.js";
+import { BookingSlotEntity } from "src/booking-slot/entities/booking-slot.entity";
+import { CreateUserToBookingSlotDto, UpdateUserToBookingSlotDto } from "../dto/user-to-booking-slot.dto";
+import { Queue } from "bull";
+import { InjectQueue } from "@nestjs/bull";
 
 @Injectable()
 export class UserToBookingSlotService {
     constructor(
-        @InjectRepository(UserToBookingSlotEntity) private readonly userToBookingSlotRepository: Repository<UserToBookingSlotEntity>
+        @InjectRepository(UserToBookingSlotEntity) private readonly userToBookingSlotRepository: Repository<UserToBookingSlotEntity>,
+        @InjectQueue('userToBookingSlotQueue') private scheduleQueue: Queue,
     ) { }
 
     async getAll(query: FilterUserToBookingSlotDto): Promise<any> {
@@ -54,15 +57,32 @@ export class UserToBookingSlotService {
     }
 
     async create(data: Partial<CreateUserToBookingSlotDto>): Promise<UserToBookingSlotEntity> {
-        const { user, bookingSlot} = data;
         const timestamp = new Date().getTime();
+        console.log(data, timestamp)
         const newUserToBookingSlot = await this.userToBookingSlotRepository.create({
             request_time: new Date(timestamp),
-            user: { id: user } as DeepPartial<UserEntity>,
-            bookingSlot: { id: bookingSlot } as DeepPartial<BookingSlotEntity>
+            user: { id: data.user } as DeepPartial<UserEntity>,
+            bookingSlot: { id: data.bookingSlot} as DeepPartial<BookingSlotEntity>
         }) as UserToBookingSlotEntity;
-        await this.userToBookingSlotRepository.save(newUserToBookingSlot);
-        return newUserToBookingSlot;
+        await this.scheduleQueue.add('expireUserToBookingSlot', { id: newUserToBookingSlot.id });
+        return await this.userToBookingSlotRepository.save(newUserToBookingSlot);
+    }
+
+    async processQueue(id: string ) {
+        const data = await this.userToBookingSlotRepository.findOne({ where: { id } });
+        if(!data){
+            throw new Error('UserToBookingSlot not found');
+        }else{
+            if(data.status === 'Pending'){
+                const currentTime = new Date();
+                const requestTime = data.request_time;
+                const diff = currentTime.getTime() - requestTime.getTime();
+                if(diff >= 24 * 60 * 60 * 1000){
+                    await this.userToBookingSlotRepository.update(id,{status: 'Rejected'}); 
+                }
+                //await this.userToBookingSlotRepository.update(id,{status: 'Rejected'}); 
+            }
+        }
     }
 
     async update(id: string, data: Partial<UpdateUserToBookingSlotDto>): Promise<UserToBookingSlotEntity> {

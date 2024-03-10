@@ -2,7 +2,7 @@ import { IsOptional, IsPhoneNumber } from "class-validator";
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, OneToMany} from "typeorm";
 import { ProfileEntity } from "./profiles.entity";
 import { BookingSlotEntity } from "src/booking-slot/entities/booking-slot.entity";
-import { UserToBookingSlotEntity } from "src/user-to-booking-slot/entity/user-to-booking-slot.ts";
+import { UserToBookingSlotEntity } from "src/user-to-booking-slot/entity/user-to-booking-slot.entity";
 
 @Entity('users')
 export class UserEntity{

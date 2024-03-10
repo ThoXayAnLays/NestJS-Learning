@@ -35,7 +35,7 @@ async function bootstrap() {
   .addTag('Books')
   .addTag('Genres')
   .addTag('Movies')
-  .addBasicAuth()
+  .addBearerAuth()
   .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

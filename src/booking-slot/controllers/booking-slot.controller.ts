@@ -5,7 +5,7 @@ import { Public } from "src/auth/decorator/public.decorator";
 import { FilterBookingSlotDto } from "../dto/filter-booking-slot";
 import { BookingSlotEntity } from "../entities/booking-slot.entity";
 import { CreateBookingSlotDto, UpdateBookingSlotDto } from "../dto";
-import { Roles } from "src/auth/decorator/roles.decorator";
+import { Types } from "src/auth/decorator/types.decorator";
 
 @ApiBearerAuth()
 @ApiTags('BookingSlots')
@@ -29,9 +29,9 @@ export class BookingSlotController {
     }
 
     @Public()
-    //@Roles('Doctor')
+    //@Types('Doctor')
     @Post()
-    async createBookingSlot(@Body() bookingSlotData: CreateBookingSlotDto): Promise<BookingSlotEntity> {
+    async createBookingSlot(@Body() bookingSlotData: Partial<CreateBookingSlotDto>): Promise<BookingSlotEntity> {
         if(bookingSlotData.user === undefined){
             throw new Error('UserId is required');
         }
@@ -39,14 +39,14 @@ export class BookingSlotController {
     }
 
     @Public()
-    //@Roles('Doctor')
+    //@Types('Doctor')
     @Put(':id')
     async updateBookingSlot(@Param('id') id: string, @Body() bookingSlotData: UpdateBookingSlotDto): Promise<BookingSlotEntity> {
         return await this.bookingSlotService.updateBookingSlot(id, bookingSlotData);
     }
 
     @Public()
-    //@Roles('Doctor')
+    //@Types('Doctor')
     @Delete(':id')
     async deleteBookingSlot(@Param('id') id: string): Promise<void> {
         return await this.bookingSlotService.deleteBookingSlot(id);

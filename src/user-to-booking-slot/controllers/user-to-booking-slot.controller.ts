@@ -1,15 +1,17 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req } from "@nestjs/common";
 import { ApiQuery, ApiTags } from "@nestjs/swagger";
 import { UserToBookingSlotService } from "../services/user-to-booking-slot.service";
 import { Public } from "src/auth/decorator/public.decorator";
 import { CreateUserToBookingSlotDto, UpdateUserToBookingSlotDto, FilterUserToBookingSlotDto } from "../dto";
-import { Roles } from "src/auth/decorator/roles.decorator";
-import { UserToBookingSlotEntity } from "../entity/user-to-booking-slot.ts";
+import { Types } from "src/auth/decorator/types.decorator";
+import { UserToBookingSlotEntity } from "../entity/user-to-booking-slot.entity";
 
 @ApiTags('UserToBookingSlots')
 @Controller('api/user-to-booking-slot')
 export class UserToBookingSlotController {
-    constructor(private readonly userToBookingSlotService: UserToBookingSlotService) { }
+    constructor(
+        private readonly userToBookingSlotService: UserToBookingSlotService,
+    ) { }
 
     @Public()
     @ApiQuery({ name: 'page'})
@@ -26,7 +28,7 @@ export class UserToBookingSlotController {
         return this.userToBookingSlotService.getById(id);
     }
 
-    //@Roles('Patient')
+    //@Types('Patient')
     @Public()
     @Post()
     async create(@Body() data: CreateUserToBookingSlotDto): Promise<UserToBookingSlotEntity>{
@@ -36,17 +38,18 @@ export class UserToBookingSlotController {
         if(data.bookingSlot === undefined){
             throw new Error('BookingSlotId is required');
         }
-        return this.userToBookingSlotService.create(data);
+        const createUserToBookingSlot = await this.userToBookingSlotService.create(data);
+        return createUserToBookingSlot;
     }
 
-    //@Roles('Doctor')
+    //@Types('Doctor')
     @Public()
     @Put(':id')
     async update(@Param('id') id: string, @Body() data: UpdateUserToBookingSlotDto): Promise<UserToBookingSlotEntity>{
         return this.userToBookingSlotService.update(id, data);
     }
 
-    @Roles('Doctor')
+    //@Types('Doctor')
     @Public()
     @Delete(':id')
     async delete(@Param('id') id: string): Promise<void>{
