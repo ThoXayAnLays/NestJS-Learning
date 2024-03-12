@@ -65,11 +65,18 @@ export class BookingSlotService {
         if(!rest.start_time || !rest.end_time) {
             throw new Error("Start time and end time are required");
         }
-        const newBookingSlot = this.bookingSlotRepository.create({
-            ...rest,
-            user: { id: user } as DeepPartial<UserEntity>
-        }) as BookingSlotEntity;
-        return await this.bookingSlotRepository.save(newBookingSlot);
+        if(rest.start_time >= rest.end_time) {
+            throw new Error("Start time must be less than end time");
+        }
+        if(checkUser.types !== 'Doctor') {
+            throw new Error("Only doctor can create booking slot");
+        }else{
+            const newBookingSlot = this.bookingSlotRepository.create({
+                ...rest,
+                user: { id: user } as DeepPartial<UserEntity>
+            }) as BookingSlotEntity;
+            return await this.bookingSlotRepository.save(newBookingSlot);
+        }
     }
 
     async updateBookingSlot(id: string, bookingSlotData: Partial<UpdateBookingSlotDto>):Promise<BookingSlotEntity> {

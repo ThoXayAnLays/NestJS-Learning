@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './user/user.module';
@@ -6,7 +6,7 @@ import { UserEntity } from './user/entities/users.entity';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { BullModule } from '@nestjs/bull';
-import { MailerModule} from '@nestjs-modules/mailer';
+import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
@@ -31,6 +31,7 @@ import { UserToBookingSlotModule } from './user-to-booking-slot/user-to-booking-
 import { UserToBookingSlotEntity } from './user-to-booking-slot/entity/user-to-booking-slot.entity';
 import { BookingSlotEntity } from './booking-slot/entities/booking-slot.entity';
 import { BookingSlotModule } from './booking-slot/booking-slot.module';
+import { AuthMiddleware } from './auth/auth.middleware';
 
 
 @Module({
@@ -69,7 +70,7 @@ import { BookingSlotModule } from './booking-slot/booking-slot.module';
     // ScheduleModule.forRoot(),
     MailerModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async(config: ConfigService) => ({
+      useFactory: async (config: ConfigService) => ({
         //transport: config.get('MAIL_TRANSPORT'),
         transport: {
           host: config.get('MAIL_HOST'),
@@ -83,7 +84,7 @@ import { BookingSlotModule } from './booking-slot/booking-slot.module';
           from: `"No Reply" <${config.get('MAIL_FROM')}>`
         },
         template: {
-          dir: join(__dirname, 'mail/templates'),  
+          dir: join(__dirname, 'mail/templates'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,
@@ -94,12 +95,13 @@ import { BookingSlotModule } from './booking-slot/booking-slot.module';
     }),
     BullModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async(config: ConfigService) => ({
+      useFactory: async (config: ConfigService) => ({
         redis: {
-          host: 'localhost',
-          port: 5003,
-          
-        }
+          host: config.get('REDIS_HOST'),
+          port: config.get('REDIS_PORT'),
+          // username: config.get('REDIS_USERNAME'),
+          password: config.get('REDIS_PASSWORD'),
+        },
       }),
       inject: [ConfigService],
     }),
@@ -119,4 +121,9 @@ import { BookingSlotModule } from './booking-slot/booking-slot.module';
 })
 export class AppModule {
   //constructor(private dataSoure: DataSource){}
+  // configure(consumer: MiddlewareConsumer) {
+  //   consumer
+  //     .apply(AuthMiddleware)
+  //     .forRoutes({ path: '*', method: RequestMethod.ALL }); // Apply middleware to all routes
+  // }
 }

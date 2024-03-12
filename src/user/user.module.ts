@@ -44,10 +44,10 @@ import { UserRepository } from './repositories/user.repository';
     providers: [
         UserService, 
         ProfileService,
-        UserRepository,
+        //UserRepository,
         EmailConsumer
     ],
-    exports: [UserService, ProfileService, UserRepository],
+    exports: [UserService, ProfileService, /*UserRepository*/],
 })
 
 export class UsersModule {}

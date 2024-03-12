@@ -35,10 +35,11 @@ export class UserController {
     }
 
     @Public()
-    @Get('getCurrentUser')
-    async getUserById(@Req() req:any): Promise<UserEntity>{
+    @Get('getCurrentUser/:id')
+    async getUserById(@Param('id') id: string): Promise<UserEntity>{
         try {
-            return await this.userService.getUserById(req.user);
+            console.log(id)
+            return await this.userService.getUserById(id);
         } catch (error) {
             return error;
         }

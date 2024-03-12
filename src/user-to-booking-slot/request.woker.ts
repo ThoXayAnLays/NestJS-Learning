@@ -4,16 +4,20 @@ import { Job } from 'bull';
 import { UserToBookingSlotService } from './services/user-to-booking-slot.service';
 
 @Injectable()
-@Processor('userToBookingSlotQueue')
+@Processor('bookingQueue')
 export class RequestWorker {
-    constructor(private readonly userToBookingSlotSerivce: UserToBookingSlotService) { }
-    @Process('expireUserToBookingSlot')
-    async handleRequest(job: Job) {
-        const id = job.data.id;
+    constructor(
+        private readonly userToBookingSlotService: UserToBookingSlotService,
+    ) { }
+    @Process('processQueue')
+    async handleRequest(job: Job< {queueId:string} >) {
+        const { queueId } = job.data;
+        console.log('Processing request', queueId);
         try {
-            await this.userToBookingSlotSerivce.processQueue(id);
+            await this.userToBookingSlotService.processQueue(queueId)
+            console.log('Request processed')
         } catch (error) {
-            Logger.error(`Failed to expire UserToBookingSlot with id ${id}`, error.stack);
+            Logger.error(error);
         }
     }
 }

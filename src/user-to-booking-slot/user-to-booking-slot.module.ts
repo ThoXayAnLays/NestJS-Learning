@@ -9,28 +9,48 @@ import { BookingSlotModule } from "src/booking-slot/booking-slot.module";
 import { UserEntity } from "src/user/entities/users.entity";
 import { BookingSlotEntity } from "src/booking-slot/entities/booking-slot.entity";
 import { BullModule } from "@nestjs/bull";
+import { PassportModule } from "@nestjs/passport";
+import { JwtModule } from "@nestjs/jwt";
+import { AuthModule } from "src/auth/auth.module";
+import { RequestWorker } from "./request.woker";
 
 @Module({
     imports: [
         UsersModule,
+        AuthModule,
         BookingSlotModule,
         ConfigModule.forRoot(),
         TypeOrmModule.forFeature([UserToBookingSlotEntity,UserEntity, BookingSlotEntity]),
-        BullModule.forRootAsync({
+        PassportModule.register({
+            defaultStrategy: 'jwt',
+            property: 'user',
+            session: false,
+        }),
+        JwtModule.registerAsync({
             imports: [ConfigModule],
-            inject: [ConfigService],
             useFactory: async (configService: ConfigService) => ({
-                redis: {
-                    host: configService.get('REDIS_HOST'),
-                    port: configService.get('REDIS_PORT'),
+                secret: configService.get('AT_SECRET'),
+                signOptions: {
+                expiresIn: configService.get('EXPIRESIN'),
                 },
             }),
+            inject: [ConfigService],
         }),
+        // BullModule.forRootAsync({
+        //     imports: [ConfigModule],
+        //     inject: [ConfigService],
+        //     useFactory: async (configService: ConfigService) => ({
+        //         redis: {
+        //             host: configService.get('REDIS_HOST'),
+        //             port: configService.get('REDIS_PORT'),
+        //         },
+        //     }),
+        // }),
         BullModule.registerQueue({
-            name: 'userToBookingSlotQueue',
+            name: 'bookingQueue',
         }),
     ],
-    providers: [UserToBookingSlotService],
+    providers: [UserToBookingSlotService, RequestWorker],
     controllers: [UserToBookingSlotController],
     exports: [UserToBookingSlotService]
 })

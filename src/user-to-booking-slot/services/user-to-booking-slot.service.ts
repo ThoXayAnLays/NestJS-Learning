@@ -13,7 +13,9 @@ import { InjectQueue } from "@nestjs/bull";
 export class UserToBookingSlotService {
     constructor(
         @InjectRepository(UserToBookingSlotEntity) private readonly userToBookingSlotRepository: Repository<UserToBookingSlotEntity>,
-        @InjectQueue('userToBookingSlotQueue') private scheduleQueue: Queue,
+        @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
+        @InjectRepository(BookingSlotEntity) private readonly bookingSlotRepository: Repository<BookingSlotEntity>,
+        @InjectQueue('bookingQueue') private scheduleQueue: Queue,
     ) { }
 
     async getAll(query: FilterUserToBookingSlotDto): Promise<any> {
@@ -58,29 +60,62 @@ export class UserToBookingSlotService {
 
     async create(data: Partial<CreateUserToBookingSlotDto>): Promise<UserToBookingSlotEntity> {
         const timestamp = new Date().getTime();
-        console.log(data, timestamp)
-        const newUserToBookingSlot = await this.userToBookingSlotRepository.create({
-            request_time: new Date(timestamp),
-            user: { id: data.user } as DeepPartial<UserEntity>,
-            bookingSlot: { id: data.bookingSlot} as DeepPartial<BookingSlotEntity>
-        }) as UserToBookingSlotEntity;
-        await this.scheduleQueue.add('expireUserToBookingSlot', { id: newUserToBookingSlot.id });
-        return await this.userToBookingSlotRepository.save(newUserToBookingSlot);
+        if (!data.bookingSlot) {
+            throw new Error('BookingSlotId is required');
+        }
+        const bookingSlot = await this.bookingSlotRepository.findOne({ where: { id: data.bookingSlot } });
+        if (!bookingSlot) {
+            throw new Error('BookingSlot not found');
+        }
+        if (!data.user) {
+            throw new Error('UserId is required');
+        }
+        const user = await this.userRepository.findOne({ where: { id: data.user } });
+        if (!user) {
+            throw new Error('User not found');
+        }
+        if (user.types !== 'Patient') {
+            throw new Error('Only Patient can book slot');
+        } else {
+            const newUserToBookingSlot = await this.userToBookingSlotRepository.create({
+                request_time: new Date(timestamp),
+                user: { id: data.user } as DeepPartial<UserEntity>,
+                bookingSlot: { id: data.bookingSlot } as DeepPartial<BookingSlotEntity>
+            }) as UserToBookingSlotEntity;
+            const result = await this.userToBookingSlotRepository.save(newUserToBookingSlot);
+            const queueId = newUserToBookingSlot.id;
+            console.log('Added to db',queueId)
+            try {
+                await this.scheduleQueue.add(
+                    'processQueue',
+                    {
+                        queueId,
+                    },
+                    {
+                        delay: 60 *1000,
+                        removeOnComplete: true,
+                    }
+                );
+            } catch (error) {
+                throw new Error('Failed to add job to queue');
+            }
+            return result;
+        }
     }
 
-    async processQueue(id: string ) {
+    async processQueue(id: string) {
         const data = await this.userToBookingSlotRepository.findOne({ where: { id } });
-        if(!data){
+        if (!data) {
             throw new Error('UserToBookingSlot not found');
-        }else{
-            if(data.status === 'Pending'){
-                const currentTime = new Date();
-                const requestTime = data.request_time;
-                const diff = currentTime.getTime() - requestTime.getTime();
-                if(diff >= 24 * 60 * 60 * 1000){
-                    await this.userToBookingSlotRepository.update(id,{status: 'Rejected'}); 
-                }
-                //await this.userToBookingSlotRepository.update(id,{status: 'Rejected'}); 
+        } else {
+            if (data.status === 'Pending') {
+                // const currentTime = new Date();
+                // const requestTime = data.request_time;
+                // const diff = currentTime.getTime() - requestTime.getTime();
+                // if(diff >=  60 * 1000){
+                //     await this.userToBookingSlotRepository.update(id,{status: 'Rejected'}); 
+                // }
+                await this.userToBookingSlotRepository.update(id, { status: 'Rejected' });
             }
         }
     }

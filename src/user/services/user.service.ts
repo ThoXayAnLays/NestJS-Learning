@@ -129,8 +129,8 @@ export class UserService {
         }
     }
 
-    async getUserById(id:string): Promise<UserEntity>{
-        const result = await this.userRepository.findOne({where: {id: id}});
+    async getUserById(userId:string): Promise<UserEntity>{
+        const result = await this.userRepository.findOne({where: {id: userId}});
         if(!result){
             throw new HttpException('User not found', 404);
         }
