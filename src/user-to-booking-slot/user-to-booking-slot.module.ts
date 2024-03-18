@@ -16,26 +16,26 @@ import { RequestWorker } from "./request.woker";
 
 @Module({
     imports: [
-        UsersModule,
-        AuthModule,
-        BookingSlotModule,
+        //AuthModule,
+        //BookingSlotModule,
         ConfigModule.forRoot(),
-        TypeOrmModule.forFeature([UserToBookingSlotEntity,UserEntity, BookingSlotEntity]),
-        PassportModule.register({
-            defaultStrategy: 'jwt',
-            property: 'user',
-            session: false,
-        }),
-        JwtModule.registerAsync({
-            imports: [ConfigModule],
-            useFactory: async (configService: ConfigService) => ({
-                secret: configService.get('AT_SECRET'),
-                signOptions: {
-                expiresIn: configService.get('EXPIRESIN'),
-                },
-            }),
-            inject: [ConfigService],
-        }),
+        TypeOrmModule.forFeature([UserToBookingSlotEntity, UserEntity, BookingSlotEntity]),
+        UsersModule,
+        // PassportModule.register({
+        //     defaultStrategy: 'jwt',
+        //     property: 'user',
+        //     session: false,
+        // }),
+        // JwtModule.registerAsync({
+        //     imports: [ConfigModule],
+        //     useFactory: async (configService: ConfigService) => ({
+        //         secret: configService.get('AT_SECRET'),
+        //         signOptions: {
+        //         expiresIn: configService.get('EXPIRESIN'),
+        //         },
+        //     }),
+        //     inject: [ConfigService],
+        // }),
         // BullModule.forRootAsync({
         //     imports: [ConfigModule],
         //     inject: [ConfigService],

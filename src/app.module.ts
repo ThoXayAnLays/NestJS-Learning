@@ -67,7 +67,7 @@ import { AuthMiddleware } from './auth/auth.middleware';
       envFilePath: ['.env'],
     }),
     // EventEmitterModule.forRoot(),
-    // ScheduleModule.forRoot(),
+    ScheduleModule.forRoot(),
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (config: ConfigService) => ({
@@ -121,9 +121,9 @@ import { AuthMiddleware } from './auth/auth.middleware';
 })
 export class AppModule {
   //constructor(private dataSoure: DataSource){}
-  // configure(consumer: MiddlewareConsumer) {
-  //   consumer
-  //     .apply(AuthMiddleware)
-  //     .forRoutes({ path: '*', method: RequestMethod.ALL }); // Apply middleware to all routes
-  // }
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthMiddleware)
+      .forRoutes({ path: '*', method: RequestMethod.ALL }); // Apply middleware to all routes
+  }
 }

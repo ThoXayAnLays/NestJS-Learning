@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req } from "@nestjs/common";
 import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { BookingSlotService } from "../serivces/booking-slot.service";
 import { Public } from "src/auth/decorator/public.decorator";
@@ -14,12 +14,15 @@ export class BookingSlotController {
     constructor(private readonly bookingSlotService: BookingSlotService) { }
 
     @Public()
-    @ApiQuery({ name: 'page'})
     @ApiQuery({ name: 'item_per_page'})
-    @ApiQuery({ name: 'search'})
+    @ApiQuery({ name: 'page'})
     @Get()
-    async getAllBookingSlots(@Query() query: FilterBookingSlotDto): Promise<any> {
-        return await this.bookingSlotService.getAllBookingSlots(query);
+    async getAllBookingSlots(@Query() query: FilterBookingSlotDto): Promise<BookingSlotEntity> {
+        try {
+            return await this.bookingSlotService.getAllBookingSlots(query);
+        } catch (error) {
+            return error;
+        }
     }
 
     @Public()
@@ -29,24 +32,22 @@ export class BookingSlotController {
     }
 
     @Public()
-    //@Types('Doctor')
+    @Types('Doctor')
     @Post()
-    async createBookingSlot(@Body() bookingSlotData: Partial<CreateBookingSlotDto>): Promise<BookingSlotEntity> {
-        if(bookingSlotData.user === undefined){
-            throw new Error('UserId is required');
-        }
-        return await this.bookingSlotService.createBookingSlot(bookingSlotData);
+    async createBookingSlot(@Body() bookingSlotData: CreateBookingSlotDto, @Req() req:any): Promise<BookingSlotEntity> {
+        console.log('User id:',req.user.id)
+        return await this.bookingSlotService.createBookingSlot(bookingSlotData, req.user.id);
     }
 
     @Public()
-    //@Types('Doctor')
+    @Types('Doctor')
     @Put(':id')
     async updateBookingSlot(@Param('id') id: string, @Body() bookingSlotData: UpdateBookingSlotDto): Promise<BookingSlotEntity> {
         return await this.bookingSlotService.updateBookingSlot(id, bookingSlotData);
     }
 
     @Public()
-    //@Types('Doctor')
+    @Types('Doctor')
     @Delete(':id')
     async deleteBookingSlot(@Param('id') id: string): Promise<void> {
         return await this.bookingSlotService.deleteBookingSlot(id);

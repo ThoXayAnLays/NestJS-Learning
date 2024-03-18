@@ -3,6 +3,7 @@ import { Expose } from 'class-transformer';
 import {
     IsEmail,
     IsNotEmpty,
+    IsOptional,
     IsString,
 } from 'class-validator';
 
@@ -21,6 +22,10 @@ export class UserDto {
     @IsString({ message: 'Invalid password' })
     @ApiProperty()
     password: string;
+
+    @IsOptional()
+    @IsString({ message: 'Invalid role' })
+    roles: string;
 }
 
 export class LoginUserDto {

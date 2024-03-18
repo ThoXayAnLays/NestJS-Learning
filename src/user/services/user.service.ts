@@ -111,7 +111,7 @@ export class UserService {
             ],
             take: item_per_page,
             skip: skip,
-            select: ['id', 'userName', 'email', 'types']
+            select: ['id', 'userName', 'email', 'roles']
         });
         const lastPage = Math.ceil(total / item_per_page);
         const nextPage = page + 1 > lastPage ? null : page + 1;

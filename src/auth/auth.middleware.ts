@@ -1,31 +1,34 @@
-import { Injectable, NestMiddleware, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import * as jwt from 'jsonwebtoken';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {
+    constructor(private jwtService: JwtService) { }
     private excludedRoutes = ['/api/auth/login', '/api/auth/register'];
-    use(req: Request, res: Response, next: NextFunction) {
-        const path = req.originalUrl;
 
+    use(req: Request, res: Response, next: NextFunction) {
+        const path = req.path;
         if (this.excludedRoutes.includes(path)) {
-            // Skip authentication for excluded routes
+            // Skip authentication middleware for excluded routes
             return next();
         }
-
-        const authHeader = req.headers.authorization;
-
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            throw new UnauthorizedException('Invalid or missing Authorization header');
-        }
-
-        const token = authHeader.split(' ')[1];
-        try {
-            const decodedToken = jwt.verify(token, process.env.AT_SECRET) as { userId: string };
-            req['userId'] = decodedToken.userId; // Add userId to the request object
-            next();
-        } catch (error) {
-            throw new UnauthorizedException('Invalid token');
-        }
+        const authHeader = req.headers['authorization'];
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            const token = authHeader.substring(7);
+            try {
+                const decoded = this.jwtService.verify(token);
+                req.user = decoded; // Assign decoded user data to request object
+            } catch (error) {
+                // Handle token verification error
+            }
+        } 
+        // else {
+        //     // Handle missing or invalid Authorization header
+        //     // For example, you might want to return a 401 Unauthorized response
+        //     res.status(401).json({ message: 'Unauthorized' });
+        //     return;
+        // }
+        next();
     }
 }

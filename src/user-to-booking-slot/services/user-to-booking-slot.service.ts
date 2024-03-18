@@ -6,8 +6,9 @@ import { FilterUserToBookingSlotDto } from "../dto/filter-user-to-booking-slot.d
 import { UserEntity } from "src/user/entities/users.entity";
 import { BookingSlotEntity } from "src/booking-slot/entities/booking-slot.entity";
 import { CreateUserToBookingSlotDto, UpdateUserToBookingSlotDto } from "../dto/user-to-booking-slot.dto";
-import { Queue } from "bull";
+import { Job, Queue } from "bull";
 import { InjectQueue } from "@nestjs/bull";
+import { Cron, CronExpression } from "@nestjs/schedule";
 
 @Injectable()
 export class UserToBookingSlotService {
@@ -50,94 +51,111 @@ export class UserToBookingSlotService {
         }
     }
 
-    async getById(id: string): Promise<UserToBookingSlotEntity> {
+    async getById(id: string): Promise<any> {
         const result = await this.userToBookingSlotRepository.findOne({ where: { id } });
         if (!result) {
-            throw new Error('UserToBookingSlot not found');
+            return('UserToBookingSlot not found');
         }
         return result;
     }
 
-    async create(data: Partial<CreateUserToBookingSlotDto>): Promise<UserToBookingSlotEntity> {
+    async create(data: Partial<CreateUserToBookingSlotDto>, userId: string): Promise<any> {
         const timestamp = new Date().getTime();
         if (!data.bookingSlot) {
-            throw new Error('BookingSlotId is required');
+            return ('BookingSlotId is required');
         }
         const bookingSlot = await this.bookingSlotRepository.findOne({ where: { id: data.bookingSlot } });
         if (!bookingSlot) {
-            throw new Error('BookingSlot not found');
+            return('BookingSlot not found');
         }
-        if (!data.user) {
-            throw new Error('UserId is required');
+        if (bookingSlot.isBooked === true) {
+            return('BookingSlot is already booked');
         }
-        const user = await this.userRepository.findOne({ where: { id: data.user } });
+        if (!userId) {
+            return('UserId is required');
+        }
+        const user = await this.userRepository.findOne({ where: { id: userId } });
         if (!user) {
-            throw new Error('User not found');
+            return('User not found');
         }
-        if (user.types !== 'Patient') {
-            throw new Error('Only Patient can book slot');
-        } else {
-            const newUserToBookingSlot = await this.userToBookingSlotRepository.create({
-                request_time: new Date(timestamp),
-                user: { id: data.user } as DeepPartial<UserEntity>,
-                bookingSlot: { id: data.bookingSlot } as DeepPartial<BookingSlotEntity>
-            }) as UserToBookingSlotEntity;
-            const result = await this.userToBookingSlotRepository.save(newUserToBookingSlot);
-            const queueId = newUserToBookingSlot.id;
-            console.log('Added to db',queueId)
-            try {
-                await this.scheduleQueue.add(
-                    'processQueue',
-                    {
-                        queueId,
-                    },
-                    {
-                        delay: 60 *1000,
-                        removeOnComplete: true,
-                    }
-                );
-            } catch (error) {
-                throw new Error('Failed to add job to queue');
-            }
-            return result;
-        }
+        const newUserToBookingSlot = await this.userToBookingSlotRepository.create({
+            request_time: new Date(timestamp),
+            user: { id: userId } as DeepPartial<UserEntity>,
+            bookingSlot: { id: data.bookingSlot } as DeepPartial<BookingSlotEntity>
+        }) as UserToBookingSlotEntity;
+        await this.bookingSlotRepository.update({ id: data.bookingSlot }, { isBooked: true });
+        const result = await this.userToBookingSlotRepository.save(newUserToBookingSlot);
+        const queueId = newUserToBookingSlot.id;
+        console.log('Added to db', queueId)
+        // try {
+        //     await this.scheduleQueue.add(
+        //         'processQueue',
+        //         {
+        //             queueId: queueId,
+        //         },
+        //         {
+        //             removeOnComplete: true,
+        //         }
+        //     );
+        // } catch (error) {
+        //     throw new Error('Failed to add job to queue');
+        // }
+        return result;
     }
 
-    async processQueue(id: string) {
-        const data = await this.userToBookingSlotRepository.findOne({ where: { id } });
-        if (!data) {
-            throw new Error('UserToBookingSlot not found');
-        } else {
-            if (data.status === 'Pending') {
-                // const currentTime = new Date();
-                // const requestTime = data.request_time;
-                // const diff = currentTime.getTime() - requestTime.getTime();
-                // if(diff >=  60 * 1000){
-                //     await this.userToBookingSlotRepository.update(id,{status: 'Rejected'}); 
-                // }
-                await this.userToBookingSlotRepository.update(id, { status: 'Rejected' });
+    @Cron(CronExpression.EVERY_10_SECONDS, { name: 'Expire Request' })
+    async hanldeScheduledTasks() {
+        console.log('Running cron job')
+        const pendingRequests = await this.userToBookingSlotRepository.find({ where: { status: 'Pending' } });
+        for (const request of pendingRequests) {
+            if (this.isExpired(request)) {
+                await this.userToBookingSlotRepository.update(request.id, { status: 'Rejected' });
             }
         }
     }
 
-    async update(id: string, data: Partial<UpdateUserToBookingSlotDto>): Promise<UserToBookingSlotEntity> {
+    private isExpired(request: any): boolean {
+        const currentTime = new Date();
+        const requestTime = request.request_time;
+        const diff = currentTime.getTime() - requestTime.getTime();
+        const diffHours = Math.ceil(diff / (1000 * 60 * 60));
+        return diffHours >= 24;
+    }
+
+    async update(id: string, data: Partial<UpdateUserToBookingSlotDto>): Promise<any> {
         const dataToUpdate = await this.userToBookingSlotRepository.findOne({ where: { id } });
         if (!dataToUpdate) {
-            throw new Error('UserToBookingSlot not found');
+            return('UserToBookingSlot not found');
+        }
+        const checkBookingSlot = await this.bookingSlotRepository.findOne({ where: { id: data.bookingSlot } });
+        if (!checkBookingSlot) {
+            return('BookingSlot not found');
+        }
+        if(checkBookingSlot.isBooked === true) {
+            return('BookingSlot is already booked');
         }
         const { bookingSlot, status } = data;
         const updatedData = await this.userToBookingSlotRepository.update({ id }, {
             status: status,
             bookingSlot: { id: bookingSlot } as DeepPartial<BookingSlotEntity>
         });
+        if(updatedData.affected === 0) {
+            return('Failed to update UserToBookingSlot');
+        }
         return await this.userToBookingSlotRepository.findOne({ where: { id } });
     }
 
-    async delete(id: string): Promise<void> {
+    async delete(id: string): Promise<any> {
         const result = await this.userToBookingSlotRepository.findOne({ where: { id } });
         if (!result) {
-            throw new Error('UserToBookingSlot not found');
+            return('UserToBookingSlot not found');
         }
+        // const bookingSlot = await this.bookingSlotRepository.findOne({ where: { id: result.bookingSlot.id} });
+        // if (!bookingSlot) {
+        //     return('BookingSlot not found');
+        // }
+        // await this.bookingSlotRepository.update({ id: result.bookingSlot.id }, { isBooked: false });
         await this.userToBookingSlotRepository.delete({ id });
+        return('UserToBookingSlot deleted');
     }
 }

@@ -10,9 +10,9 @@ export class CreateBookingSlotDto {
     @ApiProperty()
     end_time: Date;
 
-    @IsOptional()
-    @ApiProperty()
-    user: string;
+    // @IsOptional()
+    // @ApiProperty()
+    // user: string;
 
     @IsOptional()
     @ApiProperty()
@@ -32,7 +32,7 @@ export class UpdateBookingSlotDto {
     @ApiProperty()
     isBooked: boolean;
 
-    @IsNotEmpty({ message:"User is required" })
+    @IsOptional()
     @ApiProperty()
     user: string;
 }

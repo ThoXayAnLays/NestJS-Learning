@@ -23,9 +23,8 @@ export class AuthService{
             email: user.email,
             userName: user.userName,
             password: user.password,
-            refreshToken: token.refreshToken,
-            twoFactorAuthSecret: 'test',
-            isTwoFactorAuthenticationEnabled: false,
+            roles: user.roles,
+            refreshToken: token.refreshToken
         });
         return {
             email: user.email,
@@ -46,7 +45,7 @@ export class AuthService{
     async handleVerifyToken(token){
         try{
             const payload = this.jwtService.verify(token);
-            return payload['email'];
+            return payload['email, roles, id'];
         }catch(e){
             throw new HttpException(
                 {
@@ -72,18 +71,16 @@ export class AuthService{
     }
 
     private async _createToken(
-        { email },
-        isSecondFactorAuthenticated = false,
+        { email, roles, id },
         refresh = true
     ){
         const accessToken = this.jwtService.sign({
-            email,
-            isSecondFactorAuthenticated 
+            email, roles, id
         });
 
         if(refresh){
             const refreshToken = this.jwtService.sign(
-                { email },
+                { email, roles, id },
                 {
                     secret: process.env.RT_SECRET,
                     expiresIn: process.env.EXPIRESIN_REFRESH,
@@ -122,9 +119,11 @@ export class AuthService{
                 refresh_token,
                 payload.email
             );
-            const token = await this._createToken(user, true, false);
+            const token = await this._createToken(user, true);
             return{
                 email: user.email,
+                roles: user.roles,
+                id: user.id,
                 ...token,
             }
         } catch(e){

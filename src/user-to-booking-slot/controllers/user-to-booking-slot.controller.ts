@@ -1,11 +1,12 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req } from "@nestjs/common";
-import { ApiQuery, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { UserToBookingSlotService } from "../services/user-to-booking-slot.service";
 import { Public } from "src/auth/decorator/public.decorator";
 import { CreateUserToBookingSlotDto, UpdateUserToBookingSlotDto, FilterUserToBookingSlotDto } from "../dto";
 import { Types } from "src/auth/decorator/types.decorator";
 import { UserToBookingSlotEntity } from "../entity/user-to-booking-slot.entity";
 
+@ApiBearerAuth()
 @ApiTags('UserToBookingSlots')
 @Controller('api/user-to-booking-slot')
 export class UserToBookingSlotController {
@@ -28,28 +29,23 @@ export class UserToBookingSlotController {
         return this.userToBookingSlotService.getById(id);
     }
 
-    //@Types('Patient')
     @Public()
+    @Types('Patient')
     @Post()
-    async create(@Body() data: CreateUserToBookingSlotDto): Promise<UserToBookingSlotEntity>{
-        if(data.user === undefined){
-            throw new Error('UserId is required');
-        }
-        if(data.bookingSlot === undefined){
-            throw new Error('BookingSlotId is required');
-        }
-        const createUserToBookingSlot = await this.userToBookingSlotService.create(data);
-        return createUserToBookingSlot;
+    async create(@Body() data: CreateUserToBookingSlotDto, @Req() req:any) : Promise<any>{
+        console.log('User id:',req.user.id)
+        const result = await this.userToBookingSlotService.create(data, req.user.id);
+        return result;
     }
 
-    //@Types('Doctor')
+    @Types('Doctor')
     @Public()
     @Put(':id')
-    async update(@Param('id') id: string, @Body() data: UpdateUserToBookingSlotDto): Promise<UserToBookingSlotEntity>{
+    async update(@Param('id') id: string, @Body() data: UpdateUserToBookingSlotDto, @Req() req:any): Promise<UserToBookingSlotEntity>{
         return this.userToBookingSlotService.update(id, data);
     }
 
-    //@Types('Doctor')
+    @Types('Doctor')
     @Public()
     @Delete(':id')
     async delete(@Param('id') id: string): Promise<void>{

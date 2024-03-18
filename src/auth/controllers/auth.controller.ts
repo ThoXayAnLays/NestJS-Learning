@@ -33,7 +33,7 @@ export class AuthController {
     @Public()
     @ApiResponse({status:201, description:'Get Refresh Token successfully!'})
     @ApiResponse({status:401, description:'Get Refresh Token fail!'})
-    async refresh(@Body() body) {
+    async refresh(@Body() body:any) {
         return await this.authService.refresh(body.refresh_token);
     }
 

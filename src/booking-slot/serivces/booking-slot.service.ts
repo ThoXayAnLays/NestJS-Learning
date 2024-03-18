@@ -19,12 +19,8 @@ export class BookingSlotService {
         const item_per_page = Number(query.item_per_page) || 10;
         const page = Number(query.page) || 1;
         const skip = (page - 1) * item_per_page;
-        const search = query.search || '';
 
         const [res, total] = await this.bookingSlotRepository.findAndCount({
-            where: [
-                { user: Like('%' + search + '%') },
-            ],
             take: item_per_page,
             skip: skip,
             select: ['id', 'start_time', 'end_time', 'user', 'isBooked']
@@ -45,59 +41,68 @@ export class BookingSlotService {
         }
     }
 
-    async getBookingSlotById(id:string): Promise<BookingSlotEntity> {
+    async getBookingSlotById(id:string): Promise<any> {
         const bookingSlot = await this.bookingSlotRepository.findOne({ where: { id } });
         if(!bookingSlot) {
-            throw new Error("Booking slot not found");
+            return("Booking slot not found");
         }
         return bookingSlot;
     }
 
-    async createBookingSlot(bookingSlotData: Partial<CreateBookingSlotDto>): Promise<BookingSlotEntity>{
-        const { user, ...rest } = bookingSlotData;
-        if(!user) {
-            throw new Error("User is required");
+    async createBookingSlot(bookingSlotData: Partial<CreateBookingSlotDto>, userId: string): Promise<any>{
+        const { start_time, end_time, isBooked } = bookingSlotData;
+        if(!userId) {
+            return("User is required");
         }
-        const checkUser = await this.userRepository.findOne({ where: { id: user } });
+        const checkUser = await this.userRepository.findOne({ where: { id: userId } });
         if(!checkUser){
-            throw new Error("User not found");
+            return("User not found");
         }
-        if(!rest.start_time || !rest.end_time) {
-            throw new Error("Start time and end time are required");
+        if(!start_time || !end_time) {
+            return("Start time and end time are required");
         }
-        if(rest.start_time >= rest.end_time) {
-            throw new Error("Start time must be less than end time");
+        if(start_time >= end_time) {
+            return("Start time must be less than end time");
         }
-        if(checkUser.types !== 'Doctor') {
-            throw new Error("Only doctor can create booking slot");
-        }else{
-            const newBookingSlot = this.bookingSlotRepository.create({
-                ...rest,
-                user: { id: user } as DeepPartial<UserEntity>
-            }) as BookingSlotEntity;
-            return await this.bookingSlotRepository.save(newBookingSlot);
-        }
+        const newBookingSlot = this.bookingSlotRepository.create({
+            start_time,
+            end_time,
+            isBooked,
+            user: { id: userId } as DeepPartial<UserEntity>
+        }) as BookingSlotEntity;
+        return await this.bookingSlotRepository.save(newBookingSlot);
     }
 
-    async updateBookingSlot(id: string, bookingSlotData: Partial<UpdateBookingSlotDto>):Promise<BookingSlotEntity> {
+    async updateBookingSlot(id: string, bookingSlotData: Partial<UpdateBookingSlotDto>):Promise<any> {
         const bookingSlot = await this.bookingSlotRepository.findOne({ where: { id } });
         if(!bookingSlot) {
-            throw new Error("Booking slot not found");
+            return("Booking slot not found");
         }
-        const { user, ...rest } = bookingSlotData;
+        if(!bookingSlotData.user) {
+            return ("User is required");
+        }
+        const checkUser = await this.userRepository.findOne({ where: { id: bookingSlotData.user } });
+        if(!checkUser){
+            return("User not found");
+        }
+        if(checkUser.roles !== 'Doctor') {
+            return("Only doctor can update booking slot");
+        }
+        const { start_time, end_time, isBooked } = bookingSlotData;
         const updatedBookingSlot = {
-            ...rest,
-            user: { id: user }
+            start_time, end_time, isBooked,
+            user: { id: bookingSlotData.user } as DeepPartial<UserEntity>
         }
         await this.bookingSlotRepository.update({ id }, updatedBookingSlot);
         return await this.bookingSlotRepository.findOne({ where: { id } });
     }
 
-    async deleteBookingSlot(id: string): Promise<void> {
+    async deleteBookingSlot(id: string): Promise<any> {
         const bookingSlot = await this.bookingSlotRepository.findOne({ where: { id } });
         if(!bookingSlot) {
-            throw new Error("Booking slot not found");
+            return("Booking slot not found");
         }
         await this.bookingSlotRepository.delete({ id });
+        return ('Booking slot deleted')
     }
 }

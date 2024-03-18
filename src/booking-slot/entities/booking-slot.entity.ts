@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany } from "typeorm";
 import { UserToBookingSlotEntity } from "../../user-to-booking-slot/entity/user-to-booking-slot.entity"
-import { UserEntity } from "src/user/entities/users.entity";
+import { UserEntity } from "../../user/entities/users.entity";
 
 @Entity('booking-slots')
 export class BookingSlotEntity {

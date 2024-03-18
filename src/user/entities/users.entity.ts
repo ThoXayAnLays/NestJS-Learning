@@ -1,8 +1,8 @@
 import { IsOptional, IsPhoneNumber } from "class-validator";
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, OneToMany} from "typeorm";
 import { ProfileEntity } from "./profiles.entity";
-import { BookingSlotEntity } from "src/booking-slot/entities/booking-slot.entity";
-import { UserToBookingSlotEntity } from "src/user-to-booking-slot/entity/user-to-booking-slot.entity";
+import { BookingSlotEntity } from "../../booking-slot/entities/booking-slot.entity";
+import { UserToBookingSlotEntity } from "../../user-to-booking-slot/entity/user-to-booking-slot.entity";
 
 @Entity('users')
 export class UserEntity{
@@ -22,8 +22,8 @@ export class UserEntity{
     @IsOptional()
     refreshToken: string;
 
-    @Column({type: 'enum', enum: ['Patient', 'Doctor'], default: 'Patient'})
-    types: string;
+    @Column({ default: 'Patient'})
+    roles: string;
 
     @OneToMany(() => BookingSlotEntity, bookingSlot => bookingSlot.user)
     bookingSlots: BookingSlotEntity[];
