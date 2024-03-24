@@ -43,7 +43,6 @@ import { AuthMiddleware } from './auth/auth.middleware';
     AuthorModule,
     BookModule,
     BookingSlotModule,
-    UserToBookingSlotModule,
     //GGAuthModule,
     OrderModule,
     PassportModule.register({ session: true }),
@@ -93,18 +92,13 @@ import { AuthMiddleware } from './auth/auth.middleware';
       }),
       inject: [ConfigService],
     }),
-    BullModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: async (config: ConfigService) => ({
-        redis: {
-          host: config.get('REDIS_HOST'),
-          port: config.get('REDIS_PORT'),
-          // username: config.get('REDIS_USERNAME'),
-          password: config.get('REDIS_PASSWORD'),
-        },
-      }),
-      inject: [ConfigService],
+    BullModule.forRoot({
+      redis: {
+        host: 'localhost',
+        port: 6379,
+      },
     }),
+    UserToBookingSlotModule,
     MessagesModule,
   ],
   providers: [

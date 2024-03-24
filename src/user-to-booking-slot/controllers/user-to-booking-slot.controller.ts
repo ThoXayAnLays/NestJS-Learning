@@ -15,8 +15,8 @@ export class UserToBookingSlotController {
     ) { }
 
     @Public()
-    @ApiQuery({ name: 'page'})
     @ApiQuery({ name: 'item_per_page'})
+    @ApiQuery({ name: 'page'})
     @ApiQuery({ name: 'search'})
     @Get()
     async getAll(@Query() query: FilterUserToBookingSlotDto): Promise<any> {

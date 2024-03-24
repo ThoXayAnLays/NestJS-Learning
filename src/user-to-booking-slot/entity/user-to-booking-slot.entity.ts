@@ -8,7 +8,7 @@ export class UserToBookingSlotEntity {
     id: string;
 
     @Column()
-    request_time: Date;
+    requestTime: Date;
 
     @Column({type: 'enum', enum: ['Pending', 'Approved', 'Rejected'], default: 'Pending'})
     status: string;

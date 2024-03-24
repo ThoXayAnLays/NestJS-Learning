@@ -37,19 +37,19 @@ export class UserService {
             throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
         }
 
-        try{
-            await this.mailerService.sendMail({
-                to: userDto.email,
-                subject: 'Welcome to NestJS!',
-                template: './confirmation',
-                context: {
-                    name: userDto.userName
-                }
-            });
-            console.log('Email sent!', userDto.email);
-        }catch(e){
-            throw new HttpException('Email not sent', HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        // try{
+        //     await this.mailerService.sendMail({
+        //         to: userDto.email,
+        //         subject: 'Welcome to NestJS!',
+        //         template: './confirmation',
+        //         context: {
+        //             name: userDto.userName
+        //         }
+        //     });
+        //     console.log('Email sent!', userDto.email);
+        // }catch(e){
+        //     throw new HttpException('Email not sent', HttpStatus.INTERNAL_SERVER_ERROR);
+        // }
 
         // await this.sendMail.add(
         //     'register', 

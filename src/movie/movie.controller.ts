@@ -2,9 +2,10 @@ import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from "@nes
 import { CreateMovieDto, UpdateMovieDto } from "./dto";
 import MovieService from "./movie.service";
 import { MovieEntity } from "src/movie/entities/movies.entity";
-import { ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { Public } from "src/auth/decorator/public.decorator";
 
+@ApiBearerAuth()
 @ApiTags('Movies')
 @Controller('api/movies')
 export default class MovieController {
@@ -32,13 +33,13 @@ export default class MovieController {
 
     @Post()
     @Public()
-    async createMovie(@Body() movieData: Partial<CreateMovieDto>): Promise<MovieEntity> {
+    async createMovie(@Body() movieData: CreateMovieDto): Promise<MovieEntity> {
         return await this.movieService.createMovie(movieData);
     }
 
     @Put(':id')
     @Public()
-    async updateMovie(@Body() movieData: Partial<UpdateMovieDto>, @Param('id') id: string): Promise<MovieEntity>{
+    async updateMovie(@Body() movieData: UpdateMovieDto, @Param('id') id: string): Promise<MovieEntity>{
         return await this.movieService.updateMovie(id, movieData);
     }
 

@@ -3,10 +3,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional } from "class-validator";
 
 export class CreateMovieDto {
-    @Expose()
-    @ApiProperty()
-    id: string;
-
     @IsNotEmpty({ message: 'Title is required' })
     @ApiProperty()
     title: string;
@@ -21,11 +17,6 @@ export class CreateMovieDto {
 }
 
 export class UpdateMovieDto {
-    @Expose()
-    @ApiProperty()
-    @IsOptional()
-    id: string;
-
     @IsOptional()
     @ApiProperty()
     title: string;
