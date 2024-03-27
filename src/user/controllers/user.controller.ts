@@ -10,7 +10,7 @@ import { extname } from "path";
 import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { FilterProfileDto } from "../dto/filter-profile.dto";
 import { Public } from "../../auth/decorator/public.decorator";
-import { Types } from "src/auth/decorator/types.decorator";
+import { Roles } from "src/auth/decorator/types.decorator";
 import { FilterUserDto } from "../dto/filter-user.dto";
 import { UserEntity } from "../entities/users.entity";
 
@@ -21,7 +21,7 @@ export class UserController {
     constructor(private readonly userService: UserService, private readonly profileService: ProfileService) {}
 
     @Public()
-    @Types('Doctor')
+    @Roles('Doctor')
     @ApiQuery({ name: 'item_per_page'})
     @ApiQuery({ name: 'page'})
     @ApiQuery({ name: 'search'})
@@ -51,7 +51,7 @@ export class UserController {
         return await this.profileService.getByUserId(req.user);
     }
 
-    @Types('Doctor')
+    @Roles('Doctor')
     @ApiQuery({ name: 'page'})
     @ApiQuery({ name: 'item_per_page'})
     @ApiQuery({ name: 'search'})

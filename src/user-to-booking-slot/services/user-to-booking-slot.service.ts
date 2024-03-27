@@ -82,35 +82,32 @@ export class UserToBookingSlotService {
             user: { id: userId } as DeepPartial<UserEntity>,
             bookingSlot: { id: data.bookingSlot } as DeepPartial<BookingSlotEntity>
         }) as UserToBookingSlotEntity;
-        //await this.bookingSlotRepository.update({ id: data.bookingSlot }, { isBooked: true });
-        const job = await this.queueService.addToQueue(newUserToBookingSlot);
+        const savedUserToBookingSlot = await this.userToBookingSlotRepository.save(newUserToBookingSlot);
+        const job = await this.queueService.addToQueue(savedUserToBookingSlot);
         if(job !== null){
             throw new HttpException('User to booking slot created', HttpStatus.CREATED);
         }
-        
-        // const result = await this.userToBookingSlotRepository.save(newUserToBookingSlot);
-        // return result;
     }
 
-    @Cron(CronExpression.EVERY_10_SECONDS, { name: 'Expire Request' })
-    async hanldeScheduledTasks() {
-        console.log('Running cron job')
-        const pendingRequests = await this.userToBookingSlotRepository.find({
-            where: { status: 'Pending' },
-            take: 100
-        })
-        await Promise.all(pendingRequests.map(async (booking) => {
-            if(this.isExpired(booking)) {
-                await this.userToBookingSlotRepository.update(booking.id, { status: 'Rejected' });
-            }
-        }));
-        //for (const request of pendingRequests) {
-        //     if (this.isExpired(request)) {
-        //         await this.userToBookingSlotRepository.update(request.id, { status: 'Rejected' });
-        //     }
-        // }
-        // 
-    }
+    // @Cron(CronExpression.EVERY_10_SECONDS, { name: 'Expire Request' })
+    // async hanldeScheduledTasks() {
+    //     console.log('Running cron job')
+    //     const pendingRequests = await this.userToBookingSlotRepository.find({
+    //         where: { status: 'Pending' },
+    //         take: 100
+    //     })
+    //     await Promise.all(pendingRequests.map(async (booking) => {
+    //         if(this.isExpired(booking)) {
+    //             await this.userToBookingSlotRepository.update(booking.id, { status: 'Rejected' });
+    //         }
+    //     }));
+    //     //for (const request of pendingRequests) {
+    //     //     if (this.isExpired(request)) {
+    //     //         await this.userToBookingSlotRepository.update(request.id, { status: 'Rejected' });
+    //     //     }
+    //     // }
+    //     // 
+    // }
 
     private isExpired(request: any): boolean {
         const currentTime = new Date();
@@ -120,18 +117,35 @@ export class UserToBookingSlotService {
         return diffHours >= 24;
     }
 
-    async updateStatus(id: string, status: string) {
+    async rejectRequest(id: string) {
         const dataToUpdate = await this.userToBookingSlotRepository.findOne({ where: { id } });
         if (!dataToUpdate) {
             throw new HttpException('UserToBookingSlot not found', HttpStatus.NOT_FOUND);
         }
         if(dataToUpdate.status === 'Approved') {
-            throw new HttpException('UserToBookingSlot is already approved', HttpStatus.BAD_REQUEST);
+            throw new HttpException('UserToBookingSlot is already Approved', HttpStatus.BAD_REQUEST);
         }
         if(dataToUpdate.status === 'Rejected') {
-            throw new HttpException('UserToBookingSlot is already rejected', HttpStatus.BAD_REQUEST);
+            throw new HttpException('UserToBookingSlot is already Rejected', HttpStatus.BAD_REQUEST);
         }
-        await this.userToBookingSlotRepository.update({ id }, { status: status });
+        await this.userToBookingSlotRepository.update({ id }, { status: 'Rejected' });
+        throw new HttpException('UserToBookingSlot rejected', HttpStatus.OK);
+    }
+
+    async acceptRequest(id: string) {
+        const dataToUpdate = await this.userToBookingSlotRepository.findOne({ where: { id }, relations: ['bookingSlot'] });
+        if (!dataToUpdate) {
+            throw new HttpException('UserToBookingSlot not found', HttpStatus.NOT_FOUND);
+        }
+        if(dataToUpdate.status === 'Approved') {
+            throw new HttpException('UserToBookingSlot is already Approved', HttpStatus.BAD_REQUEST);
+        }
+        if(dataToUpdate.status === 'Rejected') {
+            throw new HttpException('UserToBookingSlot is already Rejected', HttpStatus.BAD_REQUEST);
+        }
+        await this.bookingSlotRepository.update({ id: dataToUpdate.bookingSlot.id}, { isBooked: true });
+        await this.userToBookingSlotRepository.update({ id }, { status: 'Approved' });
+        throw new HttpException('UserToBookingSlot approved', HttpStatus.OK);
     }
 
     async update(id: string, data: Partial<UpdateUserToBookingSlotDto>): Promise<any> {
@@ -158,15 +172,15 @@ export class UserToBookingSlotService {
     }
 
     async delete(id: string): Promise<any> {
-        const result = await this.userToBookingSlotRepository.findOne({ where: { id } });
+        const result = await this.userToBookingSlotRepository.findOne({ where: { id }, relations: ['bookingSlot'] });
         if (!result) {
             throw new HttpException('UserToBookingSlot not found', HttpStatus.NOT_FOUND);
         }
-        // const bookingSlot = await this.bookingSlotRepository.findOne({ where: { id: result.bookingSlot.id} });
-        // if (!bookingSlot) {
-        //     return('BookingSlot not found');
-        // }
-        // await this.bookingSlotRepository.update({ id: result.bookingSlot.id }, { isBooked: false });
+        const bookingSlot = await this.bookingSlotRepository.findOne({ where: { id: result.bookingSlot.id} });
+        if (!bookingSlot) {
+            return('BookingSlot not found');
+        }
+        await this.bookingSlotRepository.update({ id: result.bookingSlot.id }, { isBooked: false });
         await this.userToBookingSlotRepository.delete({ id });
         throw new HttpException('UserToBookingSlot deleted', HttpStatus.OK);
     }

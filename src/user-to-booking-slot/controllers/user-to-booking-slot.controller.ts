@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiQuery, ApiTags } from "@nestjs/swagger";
 import { UserToBookingSlotService } from "../services/user-to-booking-slot.service";
 import { Public } from "src/auth/decorator/public.decorator";
 import { CreateUserToBookingSlotDto, UpdateUserToBookingSlotDto, FilterUserToBookingSlotDto } from "../dto";
-import { Types } from "src/auth/decorator/types.decorator";
+import { Roles } from "src/auth/decorator/types.decorator";
 import { UserToBookingSlotEntity } from "../entity/user-to-booking-slot.entity";
 
 @ApiBearerAuth()
@@ -30,7 +30,7 @@ export class UserToBookingSlotController {
     }
 
     @Public()
-    @Types('Patient')
+    @Roles('Patient')
     @Post()
     async create(@Body() data: CreateUserToBookingSlotDto, @Req() req:any) : Promise<any>{
         console.log('User id:',req.user.id)
@@ -38,14 +38,28 @@ export class UserToBookingSlotController {
         return result;
     }
 
-    @Types('Doctor')
+    @Roles('Doctor')
+    @Public()
+    @Put('accept-request/:id')
+    async acceptRequest(@Param('id') id: string): Promise<any>{
+        return this.userToBookingSlotService.acceptRequest(id);
+    }
+
+    @Roles('Doctor')
+    @Public()
+    @Put('reject-request/:id')
+    async reqjectRequest(@Param('id') id: string): Promise<any>{
+        return this.userToBookingSlotService.rejectRequest(id);
+    }
+
+    @Roles('Doctor')
     @Public()
     @Put(':id')
     async update(@Param('id') id: string, @Body() data: UpdateUserToBookingSlotDto, @Req() req:any): Promise<UserToBookingSlotEntity>{
         return this.userToBookingSlotService.update(id, data);
     }
 
-    @Types('Doctor')
+    @Roles('Doctor')
     @Public()
     @Delete(':id')
     async delete(@Param('id') id: string): Promise<void>{

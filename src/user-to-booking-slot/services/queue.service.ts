@@ -9,6 +9,6 @@ export class QueueService {
     ){}
 
     async addToQueue(data: any) {
-        await this.bookingQueue.add('processQueue', data, { removeOnComplete: true });
+        await this.bookingQueue.add('processQueue', data,{ delay: 6 * 1000, removeOnComplete: true });
     }
 }

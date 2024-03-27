@@ -23,14 +23,10 @@ export class RequestWorker {
         const userToBookingSlotData = job.data;
         const currentTime = new Date().getTime();
         const requestTime = new Date(userToBookingSlotData.requestTime).getTime();
-        const result = await this.userToBookingSlotRepository.save({
-            ...userToBookingSlotData
-        });
         if (currentTime - requestTime >= 24 * 60 * 60 * 1000) {
-            await this.userToBookingSlotService.updateStatus(result.id, 'Rejected')
+            await this.userToBookingSlotService.rejectRequest(userToBookingSlotData.id)
         }
-        console.log(`Processed job ${job.id} of type ${job.name} with data ${result.id}`);
-        return result;
+        console.log(`Processed job ${job.id} of type ${job.name} with data ${userToBookingSlotData.id}`);
     }
 
     @OnQueueActive()
